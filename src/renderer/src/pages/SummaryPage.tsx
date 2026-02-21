@@ -135,27 +135,34 @@ export function SummaryPage({ projects }: SummaryPageProps): React.JSX.Element {
         ) : (
           dayData.map(({ dateKey, entries, totalMinutes: dayTotal }) => (
             <div key={dateKey} className="border-b border-gray-200">
-              <div className="flex items-center justify-between px-4 py-3 bg-gray-50">
+              <div className="px-4 py-3 bg-gray-50">
                 <span className="font-medium text-gray-800 text-sm">{formatDayHeader(dateKey)}</span>
-                {entries.length > 0 ? (
-                  <span className="text-sm text-gray-600">合計 {formatDuration(dayTotal)}</span>
-                ) : (
-                  <span className="text-sm text-gray-400">（稼働なし）</span>
-                )}
               </div>
-              {entries.map(({ projectId, project, minutes, memo }) => (
-                <div key={projectId} className="flex items-center justify-between px-8 py-2 gap-4">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span
-                      className="w-3 h-3 rounded-sm shrink-0"
-                      style={{ backgroundColor: project?.color ?? '#95A5A6' }}
-                    />
-                    <span className="text-sm text-gray-700 shrink-0">{project?.name ?? projectId}</span>
-                    {memo && <span className="text-sm text-gray-400 truncate">{memo}</span>}
-                  </div>
-                  <span className="text-sm text-gray-600 tabular-nums shrink-0">{formatDuration(minutes)}</span>
+              {entries.length === 0 ? (
+                <div className="flex items-center justify-between px-8 py-2">
+                  <span className="text-sm text-gray-400">（稼働なし）</span>
                 </div>
-              ))}
+              ) : (
+                <>
+                  {entries.map(({ projectId, project, minutes, memo }) => (
+                    <div key={projectId} className="grid grid-cols-[1fr_auto] items-center px-8 py-2 gap-4">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span
+                          className="w-3 h-3 rounded-sm shrink-0"
+                          style={{ backgroundColor: project?.color ?? '#95A5A6' }}
+                        />
+                        <span className="text-sm text-gray-700 shrink-0">{project?.name ?? projectId}</span>
+                        {memo && <span className="text-sm text-gray-400 truncate">{memo}</span>}
+                      </div>
+                      <span className="text-sm text-gray-600 tabular-nums">{formatDuration(minutes)}</span>
+                    </div>
+                  ))}
+                  <div className="grid grid-cols-[1fr_auto] items-center px-8 py-2 gap-4 border-t border-gray-100">
+                    <span className="text-sm text-gray-500 text-right">合計</span>
+                    <span className="text-sm font-semibold text-gray-700 tabular-nums">{formatDuration(dayTotal)}</span>
+                  </div>
+                </>
+              )}
             </div>
           ))
         )}
