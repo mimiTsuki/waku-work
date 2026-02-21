@@ -18,6 +18,12 @@ pnpm format:fix     # Auto-fix formatting
 
 There are no tests configured yet.
 
+## Core Principles
+
+- **Do NOT maintain backward compatibility** unless explicitly requested. Break things boldly.
+- **Keep this file concise.** Context budget is limited.
+- If the prompt is unclear or you have questions, always ask the user before proceeding.
+
 ## Architecture
 
 This is an Electron app built with **electron-vite**, React 19, and TypeScript. The three-process Electron architecture maps to three source directories:

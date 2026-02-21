@@ -10,7 +10,13 @@
     "es2024": true,
     "node": true
   },
-  "ignorePatterns": ["**/node_modules", "**/dist", "**/out"],
+  "ignorePatterns": [
+    "**/node_modules",
+    "**/dist",
+    "**/out",
+    "@renderer/",
+    "src/renderer/src/components/shadcn/**"
+  ],
   "rules": {
     "constructor-super": "error",
     "for-direction": "error",

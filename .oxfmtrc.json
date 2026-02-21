@@ -5,10 +5,16 @@
   "printWidth": 100,
   "trailingComma": "none",
   "experimentalSortPackageJson": false,
+  "experimentalTailwindcss": {
+    "stylesheet": "./src/assets/main.css",
+    "preserveDuplicates": true,
+    "preserveWhitespace": true
+  },
   "ignorePatterns": [
     "out",
     "dist",
     "pnpm-lock.yaml",
+    "**/*.html",
     "LICENSE.md",
     "tsconfig.json",
     "tsconfig.*.json"
