@@ -1,12 +1,39 @@
-import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge, ipcRenderer } from 'electron'
+import type {
+  DialogSelectFolderResponse,
+  GetConfigResponse,
+  ListLogsRequest,
+  ListLogsResponse,
+  ListProjectsResponse,
+  MoveLogEntryRequest,
+  MoveLogEntryResponse,
+  SaveConfigRequest,
+  SaveConfigResponse,
+  SaveLogsRequest,
+  SaveLogsResponse,
+  SaveProjectsRequest,
+  SaveProjectsResponse
+} from '../shared'
+import { CONFIG_CHANNELS, DIALOG_CHANNELS, LOG_CHANNELS, PROJECT_CHANNELS } from '../shared'
 
-// Custom APIs for renderer
-const api = {}
+export const api = {
+  listLogs: (args: ListLogsRequest): Promise<ListLogsResponse> =>
+    ipcRenderer.invoke(LOG_CHANNELS.READ, args),
+  saveLogs: (args: SaveLogsRequest): Promise<SaveLogsResponse> =>
+    ipcRenderer.invoke(LOG_CHANNELS.WRITE, args),
+  moveLogEntry: (args: MoveLogEntryRequest): Promise<MoveLogEntryResponse> =>
+    ipcRenderer.invoke(LOG_CHANNELS.MOVE, args),
+  listProjects: (): Promise<ListProjectsResponse> => ipcRenderer.invoke(PROJECT_CHANNELS.READ),
+  saveProjects: (data: SaveProjectsRequest): Promise<SaveProjectsResponse> =>
+    ipcRenderer.invoke(PROJECT_CHANNELS.WRITE, data),
+  getConfig: (): Promise<GetConfigResponse> => ipcRenderer.invoke(CONFIG_CHANNELS.READ),
+  saveConfig: (data: SaveConfigRequest): Promise<SaveConfigResponse> =>
+    ipcRenderer.invoke(CONFIG_CHANNELS.WRITE, data),
+  selectFolder: (): Promise<DialogSelectFolderResponse> =>
+    ipcRenderer.invoke(DIALOG_CHANNELS.SELECT_FOLDER)
+}
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)

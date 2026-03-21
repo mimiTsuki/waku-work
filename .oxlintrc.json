@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "react", "unicorn"],
+  "plugins": ["import", "typescript", "react", "unicorn", "vitest", "jsx-a11y", "node", "promise"],
   "categories": {
     "correctness": "off"
   },
@@ -103,15 +103,7 @@
     "@typescript-eslint/prefer-as-const": "error",
     "@typescript-eslint/prefer-namespace-keyword": "error",
     "@typescript-eslint/triple-slash-reference": "error",
-    "@typescript-eslint/explicit-function-return-type": [
-      "error",
-      {
-        "allowExpressions": true,
-        "allowTypedFunctionExpressions": true,
-        "allowHigherOrderFunctions": true,
-        "allowIIFEs": true
-      }
-    ],
+    "@typescript-eslint/explicit-function-return-type": "off",
     "react/display-name": "error",
     "react/jsx-key": "error",
     "react/jsx-no-comment-textnodes": "error",

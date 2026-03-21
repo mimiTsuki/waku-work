@@ -1,34 +1,57 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import React, { useState } from 'react'
+import { CalendarDays, BarChart2, FolderKanban, Settings } from 'lucide-react'
+import { TimesheetPage } from '@renderer/features/timesheet'
+import { SummaryPage } from '@renderer/features/summary'
+import { ProjectPage, useProjects } from '@renderer/features/projects'
+import { SettingsPage } from '@renderer/features/settings'
+
+type Tab = 'log' | 'summary' | 'projects' | 'settings'
+
+const NAV_ITEMS: { tab: Tab; icon: React.ReactNode; label: string }[] = [
+  { tab: 'log', icon: <CalendarDays className="w-5 h-5" />, label: '稼働' },
+  { tab: 'summary', icon: <BarChart2 className="w-5 h-5" />, label: '集計' },
+  { tab: 'projects', icon: <FolderKanban className="w-5 h-5" />, label: '案件' },
+  { tab: 'settings', icon: <Settings className="w-5 h-5" />, label: '設定' }
+]
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+  const [activeTab, setActiveTab] = useState<Tab>('log')
+  const { projects, activeProjects, save: saveProjects, loading } = useProjects()
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-gray-400">読み込み中...</div>
+    )
+  }
 
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
-    </>
+    <div className="flex h-screen overflow-hidden bg-gray-50">
+      {/* Sidebar */}
+      <nav className="w-16 bg-gray-900 flex flex-col items-center py-4 gap-1 shrink-0">
+        {NAV_ITEMS.map(({ tab, icon, label }) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex flex-col items-center gap-1 w-12 py-2 rounded-lg transition-colors ${
+              activeTab === tab
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-gray-700'
+            }`}
+          >
+            {icon}
+            <span className="text-[10px] leading-none">{label}</span>
+          </button>
+        ))}
+      </nav>
+
+      {/* Main content */}
+      <main className="flex-1 overflow-hidden">
+        {activeTab === 'log' && <TimesheetPage projects={activeProjects} />}
+        {activeTab === 'summary' && <SummaryPage projects={projects} />}
+        {activeTab === 'projects' && <ProjectPage projects={projects} onSave={saveProjects} />}
+        {activeTab === 'settings' && <SettingsPage />}
+      </main>
+    </div>
   )
 }
 
