@@ -29,20 +29,41 @@ export async function setupMockApi(page: Page, options: MockOptions = {}): Promi
 
   await page.addInitScript(
     ({ p, l }) => {
+      const ipcOk = <T>(data: T) => ({ kind: 'success' as const, data })
+      const ipcOkVoid = () => ({ kind: 'success' as const, data: undefined })
+
+      // In-memory store so saves are reflected in subsequent reads
+      let storedLogs = [...l]
+      let storedProjects = [...p]
+
       // @ts-ignore mock
       window['api'] = {
-        readProjects: () => Promise.resolve(p),
-        readLogs: ({ year, month }: { year: number; month: number }) =>
+        listProjects: () => Promise.resolve(ipcOk(storedProjects)),
+        saveProjects: (projects: typeof p) => {
+          storedProjects = projects
+          return Promise.resolve(ipcOkVoid())
+        },
+        listLogs: ({ year, month }: { year: number; month: number }) =>
           Promise.resolve(
-            l.filter((e: { date: string }) => {
-              const parts = e.date.split('-').map(Number)
-              return parts[0] === year && parts[1] === month
-            })
+            ipcOk(
+              storedLogs.filter((e: { date: string }) => {
+                const parts = e.date.split('-').map(Number)
+                return parts[0] === year && parts[1] === month
+              })
+            )
           ),
-        writeLogs: () => Promise.resolve({ success: true }),
-        writeProjects: () => Promise.resolve({ success: true }),
-        readConfig: () => Promise.resolve({ dataDir: '/tmp/waku-work-test' }),
-        writeConfig: () => Promise.resolve({ success: true }),
+        saveLogs: ({ logs: newLogs }: { year: number; month: number; logs: typeof l }) => {
+          // Replace logs for that month
+          const dates = new Set(newLogs.map((e: { date: string }) => e.date))
+          storedLogs = storedLogs.filter(
+            (e: { date: string }) => !dates.has(e.date)
+          )
+          storedLogs.push(...newLogs)
+          return Promise.resolve(ipcOkVoid())
+        },
+        moveLogEntry: () => Promise.resolve(ipcOkVoid()),
+        getConfig: () => Promise.resolve(ipcOk({ dataDir: '/tmp/waku-work-test' })),
+        saveConfig: () => Promise.resolve(ipcOkVoid()),
         selectFolder: () => Promise.resolve(null)
       }
       // @ts-ignore mock
