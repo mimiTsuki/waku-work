@@ -33,7 +33,7 @@ export function ProjectPage({ projects, onSave }: ProjectPageProps): React.JSX.E
       <h2 className="text-lg font-semibold mb-4">案件管理</h2>
 
       {/* Add form */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex items-center gap-2 mb-6">
         <input
           className="flex-1 border rounded px-3 py-1.5 text-sm"
           placeholder="案件名"
