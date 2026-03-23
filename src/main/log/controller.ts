@@ -33,6 +33,18 @@ export const LogController = {
         )
         .andThen(validate(ListLogsInput.schema))
         .asyncAndThen(listLogsUsecase)
+        .andTee((v) =>
+          logger.debug('作業ログの取得に成功しました。', {
+            'ipc.channel': LOG_CHANNELS.READ,
+            'ipc.output': v
+          })
+        )
+        .orTee((e) =>
+          logger.error('作業ログの取得に失敗しました。', {
+            'ipc.channel': LOG_CHANNELS.READ,
+            'ipc.error': e
+          })
+        )
         .match(IpcOk.of, IpcErr.of)
     )
 
@@ -46,6 +58,18 @@ export const LogController = {
         )
         .andThen(validate(SaveLogsInput.schema))
         .asyncAndThen(saveLogsUsecase)
+        .andTee((v) =>
+          logger.info('作業ログの保存に成功しました。', {
+            'ipc.channel': LOG_CHANNELS.WRITE,
+            'ipc.output': v
+          })
+        )
+        .orTee((e) =>
+          logger.error('作業ログの保存に失敗しました。', {
+            'ipc.channel': LOG_CHANNELS.WRITE,
+            'ipc.error': e
+          })
+        )
         .match(IpcOk.of, IpcErr.of)
     )
 
@@ -59,6 +83,18 @@ export const LogController = {
         )
         .andThen(validate(MoveLogEntryInput.schema))
         .asyncAndThen(moveLogEntryUsecase)
+        .andTee((v) =>
+          logger.info('作業ログの移動に成功しました。', {
+            'ipc.channel': LOG_CHANNELS.MOVE,
+            'ipc.output': v
+          })
+        )
+        .orTee((e) =>
+          logger.error('作業ログの移動に失敗しました。', {
+            'ipc.channel': LOG_CHANNELS.MOVE,
+            'ipc.error': e
+          })
+        )
         .match(IpcOk.of, IpcErr.of)
     )
   }

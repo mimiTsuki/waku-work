@@ -27,6 +27,18 @@ export const ProjectController = {
           })
         )
         .asyncAndThen(() => listProjectsUsecase())
+        .andTee((v) =>
+          logger.debug('プロジェクト一覧の取得に成功しました。', {
+            'ipc.channel': PROJECT_CHANNELS.READ,
+            'ipc.output': v
+          })
+        )
+        .orTee((e) =>
+          logger.error('プロジェクト一覧の取得に失敗しました。', {
+            'ipc.channel': PROJECT_CHANNELS.READ,
+            'ipc.error': e
+          })
+        )
         .match(IpcOk.of, IpcErr.of)
     )
 
@@ -40,6 +52,18 @@ export const ProjectController = {
         )
         .andThen(validate(saveProjectsInputSchema))
         .asyncAndThen(saveProjectsUsecase)
+        .andTee((v) =>
+          logger.info('プロジェクト一覧の保存に成功しました。', {
+            'ipc.channel': PROJECT_CHANNELS.WRITE,
+            'ipc.output': v
+          })
+        )
+        .orTee((e) =>
+          logger.error('プロジェクト一覧の保存に失敗しました。', {
+            'ipc.channel': PROJECT_CHANNELS.WRITE,
+            'ipc.error': e
+          })
+        )
         .match(IpcOk.of, IpcErr.of)
     )
   }

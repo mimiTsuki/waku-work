@@ -24,6 +24,18 @@ export const ConfigController = {
           })
         )
         .asyncAndThen(() => getConfigUsecase())
+        .andTee((v) =>
+          logger.debug('設定の取得に成功しました。', {
+            'ipc.channel': CONFIG_CHANNELS.READ,
+            'ipc.output': v
+          })
+        )
+        .orTee((e) =>
+          logger.error('設定の取得に失敗しました。', {
+            'ipc.channel': CONFIG_CHANNELS.READ,
+            'ipc.error': e
+          })
+        )
         .match(IpcOk.of, IpcErr.of)
     )
 
@@ -37,6 +49,18 @@ export const ConfigController = {
         )
         .andThen(validate(AppConfig.schema))
         .asyncAndThen(saveConfigUsecase)
+        .andTee((v) =>
+          logger.info('設定の保存に成功しました。', {
+            'ipc.channel': CONFIG_CHANNELS.WRITE,
+            'ipc.output': v
+          })
+        )
+        .orTee((e) =>
+          logger.error('設定の保存に失敗しました。', {
+            'ipc.channel': CONFIG_CHANNELS.WRITE,
+            'ipc.error': e
+          })
+        )
         .match(IpcOk.of, IpcErr.of)
     )
   }
