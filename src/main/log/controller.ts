@@ -59,9 +59,14 @@ export const LogController = {
         .andThen(validate(SaveLogsInput.schema))
         .asyncAndThen(saveLogsUsecase)
         .andTee((v) =>
-          logger.info('作業ログの保存に成功しました。', {
+          logger.debug('作業ログの保存に成功しました。', {
             'ipc.channel': LOG_CHANNELS.WRITE,
             'ipc.output': v
+          })
+        )
+        .andTee(() =>
+          logger.info('作業ログの保存に成功しました。', {
+            'ipc.channel': LOG_CHANNELS.WRITE
           })
         )
         .orTee((e) =>
@@ -84,9 +89,14 @@ export const LogController = {
         .andThen(validate(MoveLogEntryInput.schema))
         .asyncAndThen(moveLogEntryUsecase)
         .andTee((v) =>
-          logger.info('作業ログの移動に成功しました。', {
+          logger.debug('作業ログの移動に成功しました。', {
             'ipc.channel': LOG_CHANNELS.MOVE,
             'ipc.output': v
+          })
+        )
+        .andTee(() =>
+          logger.info('作業ログの移動に成功しました。', {
+            'ipc.channel': LOG_CHANNELS.MOVE
           })
         )
         .orTee((e) =>

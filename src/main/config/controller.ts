@@ -50,9 +50,14 @@ export const ConfigController = {
         .andThen(validate(AppConfig.schema))
         .asyncAndThen(saveConfigUsecase)
         .andTee((v) =>
-          logger.info('設定の保存に成功しました。', {
+          logger.debug('設定の保存に成功しました。', {
             'ipc.channel': CONFIG_CHANNELS.WRITE,
             'ipc.output': v
+          })
+        )
+        .andTee(() =>
+          logger.info('設定の保存に成功しました。', {
+            'ipc.channel': CONFIG_CHANNELS.WRITE
           })
         )
         .orTee((e) =>

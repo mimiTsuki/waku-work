@@ -53,9 +53,14 @@ export const ProjectController = {
         .andThen(validate(saveProjectsInputSchema))
         .asyncAndThen(saveProjectsUsecase)
         .andTee((v) =>
-          logger.info('プロジェクト一覧の保存に成功しました。', {
+          logger.debug('プロジェクト一覧の保存に成功しました。', {
             'ipc.channel': PROJECT_CHANNELS.WRITE,
             'ipc.output': v
+          })
+        )
+        .andTee(() =>
+          logger.info('プロジェクト一覧の保存に成功しました。', {
+            'ipc.channel': PROJECT_CHANNELS.WRITE
           })
         )
         .orTee((e) =>
