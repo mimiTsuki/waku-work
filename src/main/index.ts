@@ -3,7 +3,7 @@ import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import { env } from './env'
-import { createLogger } from './utils/logger'
+import { createLogger } from '@core/utils/logger'
 
 const logger = createLogger('app')
 

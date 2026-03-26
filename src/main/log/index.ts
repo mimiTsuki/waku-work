@@ -1,4 +1,4 @@
-export { LogEntry, type LogError } from './domain'
+export { LogEntry, type LogError } from '@core/log/domain'
 export { LogController } from './controller'
 export {
   ListLogsInput,
@@ -7,6 +7,6 @@ export {
   ListLogsUsecase,
   SaveLogsUsecase,
   MoveLogEntryUsecase
-} from './usecase'
-export type { ListLogsRepository, SaveLogsRepository } from './repository'
-export { FileListLogsRepository, FileSaveLogsRepository } from './infrastructure'
+} from '@core/log/usecase'
+export type { ListLogsRepository, SaveLogsRepository } from '@core/log/repository'
+export { FileListLogsRepository, FileSaveLogsRepository } from '@core/log/infrastructure'

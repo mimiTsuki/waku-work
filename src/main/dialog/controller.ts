@@ -1,7 +1,7 @@
 import { ipcMain, dialog } from 'electron'
 import { ResultAsync } from 'neverthrow'
 import { DIALOG_CHANNELS } from '../../shared/dialog'
-import { createLogger } from '../utils/logger'
+import { createLogger } from '@core/utils/logger'
 
 const logger = createLogger('DialogController')
 

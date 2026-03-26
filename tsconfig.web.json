@@ -1,18 +1,16 @@
 {
-  "extends": ["@electron-toolkit/tsconfig/tsconfig.web.json", "./tsconfig.base.json"],
+  "extends": ["./tsconfig.base.json"],
   "include": [
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.tsx",
     "src/preload/*.d.ts",
     "src/shared/**/*",
-    "src/main/**/*"
   ],
-  "exclude": [
-    "src/main/index.ts"
-  ],
+  "exclude": [],
   "compilerOptions": {
     "composite": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
   }
 }

@@ -55,9 +55,7 @@ export async function setupMockApi(page: Page, options: MockOptions = {}): Promi
         saveLogs: ({ logs: newLogs }: { year: number; month: number; logs: typeof l }) => {
           // Replace logs for that month
           const dates = new Set(newLogs.map((e: { date: string }) => e.date))
-          storedLogs = storedLogs.filter(
-            (e: { date: string }) => !dates.has(e.date)
-          )
+          storedLogs = storedLogs.filter((e: { date: string }) => !dates.has(e.date))
           storedLogs.push(...newLogs)
           return Promise.resolve(ipcOkVoid())
         },

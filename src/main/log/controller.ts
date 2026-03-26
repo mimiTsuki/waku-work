@@ -2,10 +2,10 @@ import { ipcMain } from 'electron'
 import { ok } from 'neverthrow'
 import { LOG_CHANNELS } from '../../shared/logs'
 import { IpcErr, IpcOk } from '../../shared/result'
-import { createLogger } from '../utils/logger'
+import { createLogger } from '@core/utils/logger'
 
 const logger = createLogger('LogController')
-import { validate } from '../utils/zod'
+import { validate } from '@core/utils/zod'
 import {
   ListLogsInput,
   MoveLogEntryInput,
@@ -13,7 +13,7 @@ import {
   type ListLogsUsecase,
   type MoveLogEntryUsecase,
   type SaveLogsUsecase
-} from './usecase'
+} from '@core/log/usecase'
 
 type LogControllerDeps = {
   listLogsUsecase: ListLogsUsecase

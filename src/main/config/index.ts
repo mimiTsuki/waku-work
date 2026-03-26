@@ -1,16 +1,16 @@
-export { AppConfig, type ConfigError } from './domain'
+export { AppConfig, type ConfigError } from '@core/config/domain'
 export { ConfigController } from './controller'
-export { GetConfigUsecase, SaveConfigUsecase } from './usecase'
+export { GetConfigUsecase, SaveConfigUsecase } from '@core/config/usecase'
 export type {
   GetConfigRepository,
   SaveConfigRepository,
   EnsureConfigRepository,
   EnsureDataDirRepository
-} from './repository'
+} from '@core/config/repository'
 export {
   FileGetConfigRepository,
   FileSaveConfigRepository,
   FileEnsureConfigDirRepository,
   FileEnsureDataDirRepository,
   DEFAULT_CONFIG
-} from './infrastructure'
+} from '@core/config/infrastructure'

@@ -3,12 +3,12 @@ import { ok } from 'neverthrow'
 import { z } from 'zod'
 import { PROJECT_CHANNELS } from '../../shared/projects'
 import { IpcErr, IpcOk } from '../../shared/result'
-import { createLogger } from '../utils/logger'
+import { createLogger } from '@core/utils/logger'
 
 const logger = createLogger('ProjectController')
-import { validate } from '../utils/zod'
-import { Project } from './domain'
-import type { ListProjectsUsecase, SaveProjectsUsecase } from './usecase'
+import { validate } from '@core/utils/zod'
+import { Project } from '@core/project/domain'
+import type { ListProjectsUsecase, SaveProjectsUsecase } from '@core/project/usecase'
 
 const saveProjectsInputSchema = z.array(Project.schema)
 

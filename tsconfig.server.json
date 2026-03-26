@@ -1,0 +1,7 @@
+{
+  "extends": ["@electron-toolkit/tsconfig/tsconfig.node.json", "./tsconfig.base.json"],
+  "include": ["src/server/**/*", "src/core/**/*", "src/shared/**/*"],
+  "compilerOptions": {
+    "outDir": "dist/server"
+  }
+}

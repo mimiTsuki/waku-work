@@ -2,12 +2,12 @@ import { ipcMain } from 'electron'
 import { ok } from 'neverthrow'
 import { CONFIG_CHANNELS } from '../../shared/config'
 import { IpcErr, IpcOk } from '../../shared/result'
-import { createLogger } from '../utils/logger'
+import { createLogger } from '@core/utils/logger'
 
 const logger = createLogger('ConfigController')
-import { validate } from '../utils/zod'
-import { AppConfig } from './domain'
-import type { GetConfigUsecase, SaveConfigUsecase } from './usecase'
+import { validate } from '@core/utils/zod'
+import { AppConfig } from '@core/config/domain'
+import type { GetConfigUsecase, SaveConfigUsecase } from '@core/config/usecase'
 
 type ConfigControllerDeps = {
   getConfigUsecase: GetConfigUsecase
