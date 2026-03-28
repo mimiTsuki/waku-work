@@ -15,6 +15,7 @@ import {
 } from 'date-fns'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { DayButton } from './DayButton'
+import { cn } from '@renderer/lib/utils'
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土']
 
@@ -32,12 +33,12 @@ export function DatePicker({ selected, onSelect }: DatePickerProps) {
   const days = eachDayOfInterval({ start: calStart, end: calEnd })
 
   return (
-    <div className="p-3 w-64">
+    <div className="w-64">
       <div className="flex items-center justify-between mb-2">
         <button
           type="button"
           onClick={() => setViewDate(subMonths(viewDate, 1))}
-          className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-accent"
+          className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-primary/70"
         >
           <ChevronLeftIcon className="size-4" />
         </button>
@@ -45,17 +46,21 @@ export function DatePicker({ selected, onSelect }: DatePickerProps) {
         <button
           type="button"
           onClick={() => setViewDate(addMonths(viewDate, 1))}
-          className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-accent"
+          className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-card"
         >
           <ChevronRightIcon className="size-4" />
         </button>
       </div>
 
       <div className="grid grid-cols-7 mb-1">
-        {WEEKDAYS.map((d) => (
+        {WEEKDAYS.map((d, i) => (
           <div
             key={d}
-            className="flex items-center justify-center h-7 text-xs text-muted-foreground"
+            className={cn(
+              'flex items-center justify-center h-7 text-xs text-muted-foreground',
+              i === 0 && 'text-red-400 dark:text-red-600',
+              i === 6 && 'text-cerulean-400 dark:text-cerulean-600'
+            )}
           >
             {d}
           </div>

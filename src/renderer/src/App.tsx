@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
-import { CalendarDays, BarChart2, FolderKanban, Settings } from 'lucide-react'
-import { TimesheetPage } from '@renderer/features/timesheet'
-import { SummaryPage } from '@renderer/features/summary'
 import { ProjectPage, useProjects } from '@renderer/features/projects'
-import { SettingsPage } from '@renderer/features/settings'
+import { SettingsPage, useTheme } from '@renderer/features/settings'
+import { SummaryPage } from '@renderer/features/summary'
+import { TimesheetPage } from '@renderer/features/timesheet'
+import { cn } from '@renderer/lib/utils'
+import { BarChart2, CalendarDays, FolderKanban, Settings } from 'lucide-react'
+import React, { useState } from 'react'
 
 type Tab = 'log' | 'summary' | 'projects' | 'settings'
 
@@ -17,26 +18,30 @@ const NAV_ITEMS: { tab: Tab; icon: React.ReactNode; label: string }[] = [
 function App(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState<Tab>('log')
   const { projects, activeProjects, save: saveProjects, loading } = useProjects()
+  useTheme()
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen text-gray-400">読み込み中...</div>
+      <div className="flex items-center justify-center h-screen text-muted-foreground">
+        読み込み中...
+      </div>
     )
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar */}
-      <nav className="w-16 bg-gray-900 flex flex-col items-center py-4 gap-1 shrink-0">
+      <nav className="w-24 text-nav-foreground bg-nav dark:bg-background flex flex-col items-center gap-1 shrink-0 py-4 px-4">
         {NAV_ITEMS.map(({ tab, icon, label }) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex flex-col items-center gap-1 w-12 py-2 rounded-lg transition-colors ${
+            className={cn(
+              'cursor-pointer flex flex-col items-center gap-1 w-full py-2 rounded-lg transition-colors',
               activeTab === tab
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700'
-            }`}
+                ? 'bg-primary dark:text-primary-foreground dark:bg-primary'
+                : 'hover:bg-primary/30'
+            )}
           >
             {icon}
             <span className="text-[10px] leading-none">{label}</span>

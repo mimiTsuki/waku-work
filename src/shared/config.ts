@@ -1,8 +1,23 @@
 import { z } from 'zod'
 import type { IpcResult } from './result'
 
+export const themeTypes = {
+  SYSTEM: 'system',
+  LIGHT: 'light',
+  DARK: 'dark'
+} as const
+
+export const themeSchema = z.union([
+  z.literal(themeTypes.SYSTEM),
+  z.literal(themeTypes.LIGHT),
+  z.literal(themeTypes.DARK)
+])
+
+export type Theme = z.infer<typeof themeSchema>
+
 export const appConfigSchema = z.object({
-  dataDir: z.string()
+  dataDir: z.string(),
+  theme: themeSchema.default(themeTypes.SYSTEM)
 })
 
 export type Config = z.infer<typeof appConfigSchema>

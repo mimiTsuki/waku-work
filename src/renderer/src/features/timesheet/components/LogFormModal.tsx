@@ -33,6 +33,7 @@ import {
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
 import { schema, type LogForm, logEntryToForm, formToLogEntry } from '../models/logForm'
+import { colorPresetToCss } from '@renderer/lib/constants'
 
 export interface ModalCreateState {
   kind: 'create'
@@ -127,25 +128,24 @@ export function LogFormModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-2">
+          <div className="grid gap-6 py-4">
             {/* Date */}
-            <div className="grid gap-1.5">
+            <div className="grid gap-2">
               <Label>日付</Label>
               <Popover open={calOpen} onOpenChange={setCalOpen}>
                 <PopoverTrigger asChild>
-                  <Button
+                  <button
                     type="button"
-                    variant="outline"
                     className={cn(
-                      'justify-start text-left font-normal',
+                      'h-10 px-4 py-2 justify-start text-left font-normal border border-border text-button-foreground cursor-pointer inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
                       !dateStr && 'text-muted-foreground'
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateStr ? format(parseDateKey(dateStr), 'yyyy/MM/dd') : '日付を選択'}
-                  </Button>
+                  </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-3 bg-background" align="start">
                   <DatePicker
                     selected={dateStr ? parseDateKey(dateStr) : new Date()}
                     onSelect={(d) => {
@@ -176,7 +176,7 @@ export function LogFormModal({
             {duration && <p className="text-sm text-muted-foreground">所要時間: {duration}</p>}
 
             {/* Project */}
-            <div className="grid gap-1.5">
+            <div className="grid gap-2">
               <Label>案件</Label>
               <Controller
                 control={control}
@@ -192,7 +192,7 @@ export function LogFormModal({
                           <span className="flex items-center gap-2">
                             <span
                               className="inline-block w-3 h-3 rounded-full"
-                              style={{ backgroundColor: p.color }}
+                              style={{ backgroundColor: colorPresetToCss(p.color) }}
                             />
                             {p.name}
                           </span>
@@ -208,7 +208,7 @@ export function LogFormModal({
             </div>
 
             {/* Memo */}
-            <div className="grid gap-1.5">
+            <div className="grid gap-2">
               <Label>メモ</Label>
               <Textarea {...register('memo')} rows={3} placeholder="作業内容など（500文字以内）" />
               {errors.memo && <p className="text-xs text-red-500">{errors.memo.message}</p>}
@@ -217,10 +217,21 @@ export function LogFormModal({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="ghost"
+              className="text-muted-foreground hover:bg-muted"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               キャンセル
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              variant="ghost"
+              type="submit"
+              className="text-primary-foreground hover:bg-primary"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? '保存中...' : '保存'}
             </Button>
           </DialogFooter>

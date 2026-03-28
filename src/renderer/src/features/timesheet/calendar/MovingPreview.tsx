@@ -2,6 +2,7 @@ import React from 'react'
 import { timeToY, durationToHeight } from './calendarUtils'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
+import { colorPresetToCss } from '@renderer/lib/constants'
 
 interface MovingPreviewProps {
   entryId: string
@@ -19,7 +20,7 @@ export function MovingPreview({
   projects
 }: MovingPreviewProps): React.JSX.Element | null {
   const movingEntry = entries.find((e) => e.id === entryId)
-  const proj = movingEntry ? projects.find((p) => p.id === movingEntry.projectId) : undefined
+  const project = movingEntry ? projects.find((p) => p.id === movingEntry.projectId) : undefined
 
   return (
     <div
@@ -29,7 +30,7 @@ export function MovingPreview({
       style={{
         top: timeToY(startTime),
         height: Math.max(durationToHeight(startTime, endTime), 4),
-        backgroundColor: proj?.color ?? '#6B7280'
+        backgroundColor: colorPresetToCss(project?.color)
       }}
     />
   )

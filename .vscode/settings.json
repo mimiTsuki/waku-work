@@ -13,5 +13,12 @@
   },
   "[markdown]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
-  }
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "tailwindCSS.classFunctions": ["tw", "clsx", "tw\\.[a-z-]+", "cva"]
 }

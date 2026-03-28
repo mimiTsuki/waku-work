@@ -10,6 +10,7 @@ import {
 import { Button } from '@renderer/components/button'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
+import { colorPresetToCss } from '@renderer/lib/constants'
 
 interface DeleteConfirmDialogProps {
   open: boolean
@@ -40,41 +41,43 @@ export function DeleteConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onCancel()}>
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>稼働ログ削除</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-2">
           <DialogDescription>
             以下のログを削除しますか？この操作は元に戻せません。
           </DialogDescription>
-        </DialogHeader>
 
-        {entry && (
-          <div className="text-sm text-gray-700 space-y-1 py-2">
-            <p>
-              <span className="font-medium">案件:</span>{' '}
-              {project ? (
-                <span className="inline-flex items-center gap-1">
-                  <span
-                    className="inline-block w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: project.color }}
-                  />
-                  {project.name}
-                </span>
-              ) : (
-                '(不明)'
-              )}
-            </p>
-            <p>
-              <span className="font-medium">日付:</span> {entry.date}
-            </p>
-            <p>
-              <span className="font-medium">時刻:</span> {entry.startTime} 〜 {entry.endTime}
-            </p>
-          </div>
-        )}
+          {entry && (
+            <div className="text-sm space-y-1 py-2 p-4 rounded-lg bg-card">
+              <p>
+                <span className="font-medium">案件:</span>{' '}
+                {project ? (
+                  <span className="inline-flex items-center gap-1">
+                    <span
+                      className="inline-block w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: colorPresetToCss(project.color) }}
+                    />
+                    {project.name}
+                  </span>
+                ) : (
+                  '(不明)'
+                )}
+              </p>
+              <p>
+                <span className="font-medium">日付:</span> {entry.date}
+              </p>
+              <p>
+                <span className="font-medium">時刻:</span> {entry.startTime} 〜 {entry.endTime}
+              </p>
+            </div>
+          )}
+        </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onCancel} disabled={deleting}>
+          <Button variant="default" onClick={onCancel} disabled={deleting}>
             キャンセル
           </Button>
           <Button variant="destructive" onClick={handleConfirm} disabled={deleting}>

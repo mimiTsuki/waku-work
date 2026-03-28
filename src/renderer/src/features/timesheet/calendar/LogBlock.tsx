@@ -5,6 +5,7 @@ import { useDragContext } from '../context/DragContext'
 import type { PositionedEntry } from './calendarUtils'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
+import { colorPresetToCss } from '@renderer/lib/constants'
 
 interface LogBlockProps {
   posEntry: PositionedEntry
@@ -45,7 +46,7 @@ export function LogBlock({
     displayTop = timeToY(dragState.startTime)
   }
 
-  const bgColor = project?.color ?? '#6B7280'
+  const bgColor = colorPresetToCss(project?.color)
   const showLabel = height >= 30
   const showTime = height >= 44
 
@@ -85,13 +86,13 @@ export function LogBlock({
       {/* Content */}
       <div className="px-1 py-0.5 h-full flex flex-col overflow-hidden">
         {showLabel && (
-          <span className="text-white text-xs font-semibold leading-tight truncate">
+          <span className="text-xs font-semibold leading-tight truncate">
             {project?.name ?? '(no project)'}
-            {entry.memo && <span className="font-normal text-white/80"> {entry.memo}</span>}
+            {entry.memo && <span className="font-normal text-foreground/80"> {entry.memo}</span>}
           </span>
         )}
         {showTime && (
-          <span className="text-white/80 text-xs leading-tight">
+          <span className="text-foreground/80 text-xs leading-tight">
             {entry.startTime}〜{entry.endTime}
           </span>
         )}
@@ -101,7 +102,7 @@ export function LogBlock({
       {hovered && (
         <button
           aria-label={`${entry.memo || project?.name || 'ログ'} を削除`}
-          className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/40 flex items-center justify-center hover:bg-black/70 transition-colors"
+          className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-button flex items-center justify-center hover:bg-button-hover transition-colors"
           onMouseDown={(e) => {
             e.stopPropagation()
             e.preventDefault()
@@ -111,7 +112,7 @@ export function LogBlock({
             onDeleteRequest(entry)
           }}
         >
-          <X className="w-2.5 h-2.5 text-white" />
+          <X className="w-2.5 h-2.5 text-foreground" />
         </button>
       )}
 

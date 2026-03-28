@@ -12,6 +12,7 @@ import {
 } from '@renderer/lib/timeUtils'
 import { useWeekNavigation } from '@renderer/hooks/useWeekNavigation'
 import { readLogs } from '@renderer/api'
+import { colorPresetToCss } from '@renderer/lib/constants'
 
 const WEEKDAY_JA = ['日', '月', '火', '水', '木', '金', '土']
 
@@ -89,40 +90,40 @@ export function SummaryPage({ projects }: SummaryPageProps): React.JSX.Element {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Week navigation */}
-      <div className="flex items-center gap-2 px-4 py-2 border-b bg-white shrink-0">
-        <Button variant="outline" size="icon" onClick={goToPrevWeek}>
+      <div className="flex items-center gap-2 p-4 shrink-0">
+        <Button className="h-10" size="icon" onClick={goToPrevWeek}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <Button variant="outline" size="sm" onClick={goToThisWeek}>
+        <Button className="h-10" size="sm" onClick={goToThisWeek}>
           <Calendar className="h-4 w-4 mr-1" />
           今週
         </Button>
-        <Button variant="outline" size="icon" onClick={goToNextWeek}>
+        <Button className="h-10" size="icon" onClick={goToNextWeek}>
           <ChevronRight className="h-4 w-4" />
         </Button>
-        <span className="text-sm font-medium text-gray-700 ml-2">{weekLabel}</span>
-        <div className="ml-auto text-sm font-semibold text-gray-700">
+        <span className="text-sm font-medium ml-2">{weekLabel}</span>
+        <div className="ml-auto text-sm font-semibold">
           合計: {loading ? '...' : formatDuration(totalMinutes)}
         </div>
       </div>
 
       {/* Day list */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto rounded-2xl border border-transparent bg-card">
         {loading ? (
           <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
             読み込み中...
           </div>
         ) : (
           dayData.map(({ dateKey, entries, totalMinutes: dayTotal }) => (
-            <div key={dateKey} className="border-b border-gray-200">
-              <div className="px-4 py-3 bg-gray-50">
-                <span className="font-medium text-gray-800 text-sm">
+            <div key={dateKey} className="pt-2 border-b border-border">
+              <div className="p-4">
+                <span className="font-medium text-foreground/80 text-md">
                   {formatDayHeader(dateKey)}
                 </span>
               </div>
               {entries.length === 0 ? (
-                <div className="flex items-center justify-between px-8 py-2">
-                  <span className="text-sm text-gray-400">（稼働なし）</span>
+                <div className="flex items-center justify-between px-8 py-4">
+                  <span className="text-sm text-muted">（稼働なし）</span>
                 </div>
               ) : (
                 <>
@@ -134,21 +135,25 @@ export function SummaryPage({ projects }: SummaryPageProps): React.JSX.Element {
                       <div className="flex items-center gap-2 min-w-0">
                         <span
                           className="w-3 h-3 rounded-sm shrink-0"
-                          style={{ backgroundColor: project?.color ?? '#95A5A6' }}
+                          style={{ backgroundColor: colorPresetToCss(project?.color) }}
                         />
-                        <span className="text-sm text-gray-700 shrink-0">
+                        <span className="text-sm text-foreground shrink-0">
                           {project?.name ?? projectId}
                         </span>
-                        {memo && <span className="text-sm text-gray-400 truncate">{memo}</span>}
+                        {memo && (
+                          <span className="text-sm text-foreground/50 truncate">{memo}</span>
+                        )}
                       </div>
-                      <span className="text-sm text-gray-600 tabular-nums">
+                      <span className="text-sm text-foreground tabular-nums">
                         {formatDuration(minutes)}
                       </span>
                     </div>
                   ))}
-                  <div className="grid grid-cols-[1fr_auto] items-center px-8 py-2 gap-4 border-t border-gray-100">
-                    <span className="text-sm text-gray-500 text-right">合計</span>
-                    <span className="text-sm font-semibold text-gray-700 tabular-nums">
+                  <div className="grid grid-cols-[1fr_auto] items-center px-8 py-2 gap-4">
+                    <span className="text-sm text-gray-500 text-right dark:text-neutral-400">
+                      合計
+                    </span>
+                    <span className="text-sm font-semibold text-foreground tabular-nums">
                       {formatDuration(dayTotal)}
                     </span>
                   </div>

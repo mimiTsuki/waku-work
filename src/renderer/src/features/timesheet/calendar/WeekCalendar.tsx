@@ -108,74 +108,89 @@ function WeekCalendarInner({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-2 border-b bg-white shrink-0">
-        <Button variant="outline" size="icon" onClick={goToPrevWeek}>
+      <div className="flex items-center gap-2 p-4 shrink-0 text-nav-foreground bg-nav">
+        <Button className="h-10" size="icon" onClick={goToPrevWeek}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <Button variant="outline" size="sm" onClick={goToThisWeek}>
+        <Button className="h-10" size="sm" onClick={goToThisWeek}>
           <Calendar className="h-4 w-4 mr-1" />
           今週
         </Button>
-        <Button variant="outline" size="icon" onClick={goToNextWeek}>
+        <Button className="h-10" size="icon" onClick={goToNextWeek}>
           <ChevronRight className="h-4 w-4" />
         </Button>
-        <span className="text-sm font-medium text-gray-700 ml-2">{weekLabel}</span>
+        <span className="text-sm font-medium ml-2">{weekLabel}</span>
       </div>
 
-      {/* Day headers */}
-      <div className="flex shrink-0 border-b bg-white" role="row" aria-label="曜日ヘッダー">
-        <div className="w-14 shrink-0" />
-        {weekDays.map((day, i) => {
-          const dateKey = weekDateKeys[i]
-          const isToday = dateKey === today
-          const isSat = i === 5
-          const isSun = i === 6
-          return (
-            <div
-              key={dateKey}
-              role="columnheader"
-              aria-label={`${DAY_LABELS[i]} ${format(day, 'M/d')}`}
-              className="flex-1 text-center py-1 text-xs font-medium border-l border-gray-200"
-            >
-              <div className={isSat ? 'text-blue-600' : isSun ? 'text-red-600' : 'text-gray-600'}>
-                {DAY_LABELS[i]}
-              </div>
+      <div className="flex flex-col rounded-2xl border border-transparent bg-card h-hull overflow-y-auto">
+        {/* Day headers */}
+        <div className="flex shrink-0" role="row" aria-label="曜日ヘッダー">
+          <div className="w-14 shrink-0" />
+          {weekDays.map((day, i) => {
+            const dateKey = weekDateKeys[i]
+            const isToday = dateKey === today
+            const isSat = i === 5
+            const isSun = i === 6
+            return (
               <div
-                className={`text-sm font-semibold mt-0.5 ${
-                  isToday
-                    ? 'bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto'
-                    : isSat
-                      ? 'text-blue-600'
-                      : isSun
-                        ? 'text-red-600'
-                        : 'text-gray-900'
-                }`}
+                key={dateKey}
+                role="columnheader"
+                aria-label={`${DAY_LABELS[i]} ${format(day, 'M/d')}`}
+                className="flex-1 text-center py-2 text-xs font-medium"
               >
-                {format(day, 'd')}
+                <div
+                  className={
+                    isSat
+                      ? 'text-sky-600 dark:text-sky-500'
+                      : isSun
+                        ? 'text-pink-600 dark:text-pink-500'
+                        : 'text-foreground'
+                  }
+                >
+                  {DAY_LABELS[i]}
+                </div>
+                <div
+                  className={`text-sm font-semibold mt-0.5 w-8 h-8 flex items-center justify-center mx-auto rounded-full ${
+                    isToday
+                      ? // NOTE: 強調するためにforegroundと入れ替えている
+                        'bg-primary/70 dark:bg-primary-foreground dark:text-primary'
+                      : isSat
+                        ? 'text-sky-600 dark:text-sky-500'
+                        : isSun
+                          ? 'text-pink-600 dark:text-pink-500'
+                          : 'text-foreground'
+                  }`}
+                >
+                  {format(day, 'd')}
+                </div>
               </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
 
-      {/* Scrollable calendar grid */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto" data-testid="calendar-scrollable">
-        <div className="flex" style={{ height: 24 * HOUR_HEIGHT }}>
-          <TimeAxis />
-          {weekDateKeys.map((dateKey, i) => (
-            <DayColumn
-              key={dateKey}
-              date={dateKey}
-              entries={getLogsForDate(dateKey)}
-              projects={projects}
-              columnRef={columnCallbackRefs[i]}
-              onCreateComplete={onCreateRequest}
-              onDeleteRequest={onDeleteRequest}
-              onEditRequest={onEditRequest}
-              onMoveStart={handleDragMoveStart}
-              onResizeStart={handleResizeStartWithCol}
-            />
-          ))}
+        {/* Scrollable calendar grid */}
+        <div
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto p-4 overscroll-none"
+          data-testid="calendar-scrollable"
+        >
+          <div className="flex" style={{ height: 24.5 * HOUR_HEIGHT }}>
+            <TimeAxis />
+            {weekDateKeys.map((dateKey, i) => (
+              <DayColumn
+                key={dateKey}
+                date={dateKey}
+                entries={getLogsForDate(dateKey)}
+                projects={projects}
+                columnRef={columnCallbackRefs[i]}
+                onCreateComplete={onCreateRequest}
+                onDeleteRequest={onDeleteRequest}
+                onEditRequest={onEditRequest}
+                onMoveStart={handleDragMoveStart}
+                onResizeStart={handleResizeStartWithCol}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

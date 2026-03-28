@@ -7,6 +7,7 @@ import { LogBlock } from './LogBlock'
 import { MovingPreview } from './MovingPreview'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
+import { cn } from '@renderer/lib/utils'
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
 
@@ -61,21 +62,21 @@ export function DayColumn({
   return (
     <div
       ref={mergedRef}
-      className="relative flex-1 border-l border-gray-200 select-none"
+      className="relative flex-1 border-l border-border select-none"
       style={{ height: 24 * HOUR_HEIGHT, minWidth: 0 }}
       onMouseDown={handleMouseDown}
       data-testid="day-column"
       aria-label={`日列 ${date}`}
     >
       {/* Hour grid lines */}
-      {HOURS.map((h) => (
+      {HOURS.map((h, i) => (
         <React.Fragment key={h}>
           <div
-            className="absolute left-0 right-0 border-t border-gray-100"
+            className={cn('absolute left-0 right-0 border-border', i !== 0 ? 'border-t' : '')}
             style={{ top: h * HOUR_HEIGHT }}
           />
           <div
-            className="absolute left-0 right-0 border-t border-gray-50"
+            className="absolute left-0 right-0 border-t border-border/50"
             style={{ top: h * HOUR_HEIGHT + HOUR_HEIGHT / 2 }}
           />
         </React.Fragment>
@@ -84,7 +85,7 @@ export function DayColumn({
       {/* Creating preview */}
       {showCreating && dragState.type === 'creating' && (
         <div
-          className="absolute left-1 right-1 rounded bg-blue-400/50 border border-blue-500 pointer-events-none"
+          className="absolute left-1 right-1 rounded bg-primary/50 border border-primary pointer-events-none"
           data-testid="drag-preview"
           aria-hidden="true"
           style={{

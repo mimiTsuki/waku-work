@@ -20,7 +20,7 @@ const CONFIG_DIR = join(homedir(), '.config', 'waku-work')
 const CONFIG_FILE = join(CONFIG_DIR, 'settings.json')
 
 const DEFAULT_DATA_DIR = join(homedir(), '.config', 'waku-work', 'data')
-export const DEFAULT_CONFIG: AppConfig = { dataDir: DEFAULT_DATA_DIR }
+export const DEFAULT_CONFIG: AppConfig = { dataDir: DEFAULT_DATA_DIR, theme: 'system' }
 
 const _ensureConfigFile = () => {
   // 既に設定ファイルが存在する場合は何もしない
