@@ -13,7 +13,7 @@ export class TimesheetPage {
 
   async goto() {
     await this.page.goto('/')
-    await expect(this.page).toHaveTitle(/Electron/)
+    await expect(this.page).toHaveTitle(/waku-work/)
   }
 
   async expectDayHeadersVisible() {

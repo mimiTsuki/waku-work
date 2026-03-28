@@ -1,9 +1,11 @@
 import type { Page } from '@playwright/test'
 
-/** HOUR_HEIGHT=60 と同じ計算: 時刻文字列 "HH:mm" をグリッド上の Y ピクセル値に変換 */
+/** HOUR_HEIGHT=100 と同じ計算: 時刻文字列 "HH:mm" をグリッド上の Y ピクセル値に変換 */
+const HOUR_HEIGHT = 100
+
 export function timeToY(time: string): number {
   const [hours, minutes] = time.split(':').map(Number)
-  return hours * 60 + minutes
+  return hours * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT
 }
 
 /**
@@ -22,7 +24,19 @@ export async function getTimePosition(
   const scrollableBox = await scrollable.boundingBox()
   if (!scrollableBox) throw new Error('Scrollable container not found')
 
-  const scrollTop = await scrollable.evaluate((el) => (el as HTMLElement).scrollTop)
+  const targetY = timeToY(time)
+
+  // Scroll so the target position is visible with some margin
+  await scrollable.evaluate((el, y) => {
+    const margin = (el as HTMLElement).clientHeight / 3
+    ;(el as HTMLElement).scrollTop = Math.max(0, y - margin)
+  }, targetY)
+
+  // Re-read scrollTop and paddingTop after scrolling
+  const { scrollTop, paddingTop } = await scrollable.evaluate((el) => ({
+    scrollTop: (el as HTMLElement).scrollTop,
+    paddingTop: parseFloat(getComputedStyle(el).paddingTop)
+  }))
 
   const colInfo = await page.evaluate((idx) => {
     const container = document.querySelector('[data-testid="calendar-scrollable"]')
@@ -38,7 +52,7 @@ export async function getTimePosition(
 
   return {
     x: colInfo.left + colInfo.width / 2,
-    y: scrollableBox.y + (timeToY(time) - scrollTop)
+    y: scrollableBox.y + paddingTop + (targetY - scrollTop)
   }
 }
 

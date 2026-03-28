@@ -69,7 +69,7 @@ export class CalendarGrid {
    * 既存の稼働ブロックをクリックして編集ダイアログを開く
    * blockHeightPx: ブロックの高さ (デフォルト 60px = 1 時間分)、中央を狙う
    */
-  async clickLogBlock(dayIndex: number, startTime: string, blockHeightPx = 60) {
+  async clickLogBlock(dayIndex: number, startTime: string, blockHeightPx = 100) {
     const pos = await getTimePosition(this.page, dayIndex, startTime)
     await this.page.mouse.click(pos.x, pos.y + blockHeightPx / 2)
   }

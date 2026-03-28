@@ -33,7 +33,7 @@ test.describe('3. 稼働編集', () => {
     await mondayCol.expectLogBlockText('10:00〜11:00')
 
     // Step 2: ブロックの中央付近をクリックして編集ダイアログを開く
-    // LogBlock: top=600px(10:00), height=60px → ブロック中央 = 600+30 = 630px
+    // LogBlock: top=1000px(10:00), height=100px → ブロック中央 = 1000+50 = 1050px
     await ts.grid.clickLogBlock(0, '10:00')
 
     // ダイアログ「稼働ログ編集」が開くこと
