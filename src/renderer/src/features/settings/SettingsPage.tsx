@@ -56,6 +56,26 @@ export function SettingsPage(): React.JSX.Element {
           </Select>
         </Field.Root>
 
+        <Field.Root className="mb-6">
+          <Field.Label className="text-lg">週の始まり</Field.Label>
+          <Select
+            value={config?.weekStartOnMonday === false ? 'sunday' : 'monday'}
+            onValueChange={(v) => {
+              if (config) save({ ...config, weekStartOnMonday: v === 'monday' })
+            }}
+          >
+            <Field.Control>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+            </Field.Control>
+            <SelectContent>
+              <SelectItem value="monday">月曜日</SelectItem>
+              <SelectItem value="sunday">日曜日</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field.Root>
+
         {IS_ELECTRON && (
           <Field.Root>
             <Field.Label>データ保存フォルダ</Field.Label>

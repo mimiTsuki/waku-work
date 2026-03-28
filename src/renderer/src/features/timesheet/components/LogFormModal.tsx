@@ -22,6 +22,7 @@ import {
 } from '@renderer/components/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/popover'
 import { DatePicker } from '@renderer/components/datePicker'
+import { useWeekStartOnMonday } from '@renderer/hooks/useWeekStartOnMonday'
 import { CalendarIcon } from 'lucide-react'
 import { cn } from '@renderer/lib/utils'
 import {
@@ -64,6 +65,7 @@ export function LogFormModal({
   onSave,
   onClose
 }: LogFormModalProps): React.JSX.Element {
+  const weekStartOnMonday = useWeekStartOnMonday()
   const [calOpen, setCalOpen] = useState(false)
 
   const {
@@ -154,6 +156,7 @@ export function LogFormModal({
                       setValue('date', formatDateKey(d))
                       setCalOpen(false)
                     }}
+                    weekStartOnMonday={weekStartOnMonday}
                   />
                 </PopoverContent>
               </Popover>

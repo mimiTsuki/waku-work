@@ -11,6 +11,7 @@ import {
   getMonthsInRange
 } from '@renderer/lib/timeUtils'
 import { useWeekNavigation } from '@renderer/hooks/useWeekNavigation'
+import { useWeekStartOnMonday } from '@renderer/hooks/useWeekStartOnMonday'
 import { readLogs } from '@renderer/api'
 import { colorPresetToCss } from '@renderer/lib/constants'
 
@@ -32,7 +33,9 @@ interface SummaryPageProps {
 }
 
 export function SummaryPage({ projects }: SummaryPageProps): React.JSX.Element {
-  const { weekDays, weekLabel, goToPrevWeek, goToNextWeek, goToThisWeek } = useWeekNavigation()
+  const weekStartOnMonday = useWeekStartOnMonday()
+  const { weekDays, weekLabel, goToPrevWeek, goToNextWeek, goToThisWeek } =
+    useWeekNavigation(weekStartOnMonday)
 
   const startDate = formatDateKey(weekDays[0])
   const endDate = formatDateKey(weekDays[6])

@@ -16,7 +16,8 @@ export type Theme = z.infer<typeof themeSchema>
 
 const schema = z.object({
   dataDir: z.string(),
-  theme: themeSchema.default(themeTypes.SYSTEM)
+  theme: themeSchema.default(themeTypes.SYSTEM),
+  weekStartOnMonday: z.boolean().default(true)
 })
 
 export type AppConfig = z.infer<typeof schema>

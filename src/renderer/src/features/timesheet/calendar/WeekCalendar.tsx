@@ -11,12 +11,13 @@ import { useDragResize } from '../hooks/useDragResize'
 import { formatDateKey, getMonthsInRange } from '@renderer/lib/timeUtils'
 import { readLogs } from '@renderer/api'
 import { useWeekNavigation } from '@renderer/hooks/useWeekNavigation'
+import { useWeekStartOnMonday } from '@renderer/hooks/useWeekStartOnMonday'
 import { HOUR_HEIGHT } from './constants'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
 import { range } from '@renderer/lib/array/range'
 
-const DAY_LABELS = ['月', '火', '水', '木', '金', '土', '日']
+const ALL_DAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
 
 interface WeekCalendarProps {
   projects: Project[]
@@ -33,8 +34,9 @@ function WeekCalendarInner({
   onEditRequest,
   onUpdateEntry
 }: WeekCalendarProps): React.JSX.Element {
+  const weekStartOnMonday = useWeekStartOnMonday()
   const { weekDays, weekDateKeys, weekLabel, goToPrevWeek, goToNextWeek, goToThisWeek } =
-    useWeekNavigation()
+    useWeekNavigation(weekStartOnMonday)
   const scrollRef = useRef<HTMLDivElement>(null)
   const cols = useMemo(() => {
     return range(0, 7)
@@ -129,13 +131,15 @@ function WeekCalendarInner({
           {weekDays.map((day, i) => {
             const dateKey = weekDateKeys[i]
             const isToday = dateKey === today
-            const isSat = i === 5
-            const isSun = i === 6
+            const dayOfWeek = day.getDay()
+            const isSat = dayOfWeek === 6
+            const isSun = dayOfWeek === 0
+            const dayLabel = ALL_DAY_LABELS[dayOfWeek]
             return (
               <div
                 key={dateKey}
                 role="columnheader"
-                aria-label={`${DAY_LABELS[i]} ${format(day, 'M/d')}`}
+                aria-label={`${dayLabel} ${format(day, 'M/d')}`}
                 className="flex-1 text-center py-2 text-xs font-medium"
               >
                 <div
@@ -147,7 +151,7 @@ function WeekCalendarInner({
                         : 'text-foreground'
                   }
                 >
-                  {DAY_LABELS[i]}
+                  {dayLabel}
                 </div>
                 <div
                   className={`text-sm font-semibold mt-0.5 w-8 h-8 flex items-center justify-center mx-auto rounded-full ${

@@ -21,8 +21,8 @@ export function formatDuration(minutes: number): string {
   return `${h}:${String(m).padStart(2, '0')}`
 }
 
-export function getWeekStart(date: Date): Date {
-  return startOfWeek(date, { weekStartsOn: 1 })
+export function getWeekStart(date: Date, weekStartOnMonday: boolean = true): Date {
+  return startOfWeek(date, { weekStartsOn: weekStartOnMonday ? 1 : 0 })
 }
 
 export function getWeekDays(weekStart: Date): Date[] {
