@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArchiveIcon } from 'lucide-react'
+import { ArchiveIcon, Trash2Icon } from 'lucide-react'
 import { Button } from '@renderer/components/button'
 import {
   Tooltip,
@@ -9,6 +9,7 @@ import {
 } from '@renderer/components/tooltip'
 import { COLOR_PRESETS, ColorPreset, colorPresetToCss } from '@renderer/lib/constants'
 import type { Project } from '@shared/projects'
+import { ProjectDeleteConfirmDialog } from './ProjectDeleteConfirmDialog'
 
 interface ProjectPageProps {
   projects: Project[]
@@ -18,6 +19,7 @@ interface ProjectPageProps {
 export function ProjectPage({ projects, onSave }: ProjectPageProps): React.JSX.Element {
   const [name, setName] = React.useState('')
   const [color, setColor] = React.useState<ColorPreset>(COLOR_PRESETS[0])
+  const [deleteTarget, setDeleteTarget] = React.useState<Project | null>(null)
 
   const handleAdd = async (): Promise<void> => {
     if (!name.trim()) return
@@ -33,6 +35,12 @@ export function ProjectPage({ projects, onSave }: ProjectPageProps): React.JSX.E
 
   const handleArchive = async (id: string): Promise<void> => {
     await onSave(projects.map((p) => (p.id === id ? { ...p, archived: !p.archived } : p)))
+  }
+
+  const handleDelete = async (): Promise<void> => {
+    if (!deleteTarget) return
+    await onSave(projects.filter((p) => p.id !== deleteTarget.id))
+    setDeleteTarget(null)
   }
 
   return (
@@ -94,11 +102,30 @@ export function ProjectPage({ projects, onSave }: ProjectPageProps): React.JSX.E
                     <TooltipContent>アーカイブ</TooltipContent>
                   </Tooltip>
                 )}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="hover:text-destructive hover:bg-transparent"
+                      onClick={() => setDeleteTarget(p)}
+                    >
+                      <Trash2Icon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>削除</TooltipContent>
+                </Tooltip>
               </li>
             ))}
           </ul>
         </div>
       </div>
+      <ProjectDeleteConfirmDialog
+        open={deleteTarget !== null}
+        project={deleteTarget}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </TooltipProvider>
   )
 }
