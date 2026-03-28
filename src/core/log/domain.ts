@@ -8,7 +8,7 @@ const schema = z.object({
   projectId: UUID.schema,
   startTime: TimeString.schema,
   endTime: TimeString.schema,
-  memo: z.string(),
+  description: z.string(),
   createdAt: IsoDateTime.schema
 })
 

@@ -54,7 +54,7 @@ export function LogBlock({
     <div
       role="button"
       tabIndex={0}
-      aria-label={`${project?.name ?? '(no project)'} ${entry.startTime}〜${entry.endTime}${entry.memo ? ' ' + entry.memo : ''}`}
+      aria-label={`${project?.name ?? '(no project)'} ${entry.startTime}〜${entry.endTime}${entry.description ? ' ' + entry.description : ''}`}
       data-testid="log-block"
       className="absolute rounded overflow-hidden cursor-grab active:cursor-grabbing select-none"
       style={{
@@ -88,7 +88,9 @@ export function LogBlock({
         {showLabel && (
           <span className="text-xs font-semibold leading-tight truncate">
             {project?.name ?? '(no project)'}
-            {entry.memo && <span className="font-normal text-foreground/80"> {entry.memo}</span>}
+            {entry.description && (
+              <span className="font-normal text-foreground/80"> {entry.description}</span>
+            )}
           </span>
         )}
         {showTime && (
@@ -101,7 +103,7 @@ export function LogBlock({
       {/* Delete button */}
       {hovered && (
         <button
-          aria-label={`${entry.memo || project?.name || 'ログ'} を削除`}
+          aria-label={`${entry.description || project?.name || 'ログ'} を削除`}
           className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-button flex items-center justify-center hover:bg-button-hover transition-colors"
           onMouseDown={(e) => {
             e.stopPropagation()

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { format } from 'date-fns'
 import { useForm, Controller } from 'react-hook-form'
+import { useQuery } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
@@ -12,7 +13,7 @@ import {
 import { Button } from '@renderer/components/button'
 import { Field } from '@renderer/components/field'
 import { Input } from '@renderer/components/input'
-import { Textarea } from '@renderer/components/textarea'
+import { Combobox } from '@renderer/components/combobox'
 import {
   Select,
   SelectContent,
@@ -31,6 +32,7 @@ import {
   formatDuration,
   durationMinutes
 } from '@renderer/lib/timeUtils'
+import { readLogs } from '@renderer/api'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
 import { schema, type LogForm, logEntryToForm, formToLogEntry } from '../models/logForm'
@@ -83,7 +85,7 @@ export function LogFormModal({
       startTime: '09:00',
       endTime: '10:00',
       projectId: '',
-      memo: ''
+      description: ''
     }
   })
 
@@ -97,13 +99,39 @@ export function LogFormModal({
           startTime: defaultValues?.startTime ?? '09:00',
           endTime: defaultValues?.endTime ?? '10:00',
           projectId: projects[0]?.id ?? '',
-          memo: ''
+          description: ''
         })
       }
     }
   }, [open, defaultValues, projects, reset])
 
-  const [startTime, endTime, dateStr, memo] = watch(['startTime', 'endTime', 'date', 'memo'])
+  const [startTime, endTime, dateStr, description] = watch([
+    'startTime',
+    'endTime',
+    'date',
+    'description'
+  ])
+
+  const year = dateStr ? Number(dateStr.slice(0, 4)) : undefined
+  const month = dateStr ? Number(dateStr.slice(5, 7)) : undefined
+
+  const { data: monthLogs } = useQuery({
+    queryKey: ['logs', year, month] as const,
+    queryFn: async () => {
+      const result = await readLogs(year!, month!)
+      if (result.isErr()) return []
+      return result.value
+    },
+    enabled: open && year != null && month != null
+  })
+
+  const sameDayDescriptions = useMemo(() => {
+    if (!monthLogs || !dateStr) return []
+    const descs = monthLogs
+      .filter((log) => log.date === dateStr && log.description)
+      .map((log) => log.description)
+    return [...new Set(descs)]
+  }, [monthLogs, dateStr])
 
   const duration = (() => {
     try {
@@ -218,18 +246,30 @@ export function LogFormModal({
               )}
             </Field.Root>
 
-            {/* Memo */}
+            {/* Description */}
             <Field.Root>
-              <Field.Label>メモ</Field.Label>
+              <Field.Label>説明</Field.Label>
               <Field.Control>
-                <Textarea
-                  {...register('memo')}
-                  rows={3}
-                  placeholder="作業内容など（500文字以内）"
+                <Controller
+                  control={control}
+                  name="description"
+                  render={({ field }) => (
+                    <Combobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      suggestions={sameDayDescriptions}
+                      placeholder="作業内容など（500文字以内）"
+                      maxLength={500}
+                    />
+                  )}
                 />
               </Field.Control>
-              {errors.memo && <p className="text-xs text-red-500">{errors.memo.message}</p>}
-              <p className="text-xs text-muted-foreground text-right">{memo?.length ?? 0}/500</p>
+              {errors.description && (
+                <p className="text-xs text-red-500">{errors.description.message}</p>
+              )}
+              <p className="text-xs text-muted-foreground text-right">
+                {description?.length ?? 0}/500
+              </p>
             </Field.Root>
           </div>
 

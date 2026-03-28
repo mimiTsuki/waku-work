@@ -10,7 +10,7 @@ export interface MockLog {
   projectId: string
   startTime: string
   endTime: string
-  memo: string
+  description: string
   createdAt: string
 }
 

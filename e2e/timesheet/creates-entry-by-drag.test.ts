@@ -45,7 +45,7 @@ test.describe('2. DnD による稼働入力', () => {
 
     // Step 4: 案件が「開発業務」であること確認後、メモを入力して保存
     await expect(ts.modal.projectCombobox).toContainText('開発業務')
-    await ts.modal.memoInput.fill('DnD入力テスト')
+    await ts.modal.descriptionInput.fill('DnD入力テスト')
     await ts.modal.save()
 
     // Step 5: 火曜日列に稼働ブロックが表示されること（60px 高 → 時刻テキストも表示）

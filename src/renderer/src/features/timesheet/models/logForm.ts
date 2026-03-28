@@ -9,7 +9,7 @@ export const schema = z
     projectId: z.string().min(1, '案件を選択してください'),
     startTime: z.string().regex(timePattern, '時刻形式が不正です'),
     endTime: z.string().regex(timePattern, '時刻形式が不正です'),
-    memo: z.string().max(500, 'メモは500文字以内にしてください')
+    description: z.string().max(500, '説明は500文字以内にしてください')
   })
   .refine((data) => data.startTime < data.endTime, {
     message: '終了時刻は開始より後にしてください',
@@ -24,7 +24,7 @@ export function logEntryToForm(entry: LogEntry): LogForm {
     projectId: entry.projectId,
     startTime: entry.startTime,
     endTime: entry.endTime,
-    memo: entry.memo ?? ''
+    description: entry.description ?? ''
   }
 }
 
@@ -35,7 +35,7 @@ export function formToLogEntry(form: LogForm, original?: LogEntry): LogEntry {
     projectId: form.projectId,
     startTime: form.startTime,
     endTime: form.endTime,
-    memo: form.memo,
+    description: form.description,
     createdAt: original?.createdAt ?? new Date().toISOString()
   }
 }

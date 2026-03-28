@@ -7,7 +7,7 @@ export const logEntrySchema = z.object({
   projectId: z.uuid(),
   startTime: z.string().regex(/^\d{2}:\d{2}$/),
   endTime: z.string().regex(/^\d{2}:\d{2}$/),
-  memo: z.string(),
+  description: z.string(),
   createdAt: z.iso.datetime()
 })
 

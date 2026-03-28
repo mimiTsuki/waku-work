@@ -31,7 +31,7 @@ const baseEntry: LogEntry = {
   projectId: 'project-1',
   startTime: '09:00',
   endTime: '10:00',
-  memo: 'Test entry',
+  description: 'Test entry',
   createdAt: '2026-02-15T09:00:00.000Z'
 }
 
@@ -82,7 +82,7 @@ describe('useLogMutations', () => {
 
   describe('updateEntry', () => {
     it('同月のエントリを更新する（originalなし）', async () => {
-      const updatedEntry: LogEntry = { ...baseEntry, memo: 'Updated memo' }
+      const updatedEntry: LogEntry = { ...baseEntry, description: 'Updated description' }
       mockReadLogs.mockResolvedValue({ kind: 'success', data: [baseEntry] })
 
       const { result } = renderHook(() => useLogMutations(), {

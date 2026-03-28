@@ -24,7 +24,12 @@ function formatDayHeader(dateKey: string): string {
 
 interface DayData {
   dateKey: string
-  entries: { projectId: string; project: Project | undefined; minutes: number; memo: string }[]
+  entries: {
+    projectId: string
+    project: Project | undefined
+    minutes: number
+    description: string
+  }[]
   totalMinutes: number
 }
 
@@ -63,14 +68,16 @@ export function SummaryPage({ projects }: SummaryPageProps): React.JSX.Element {
   const dayData = useMemo((): DayData[] => {
     const projectMap = new Map(projects.map((p) => [p.id, p]))
 
-    const grouped = new Map<string, Map<string, { minutes: number; memos: string[] }>>()
+    const grouped = new Map<string, Map<string, { minutes: number; descriptions: string[] }>>()
     for (const log of logs) {
       if (!grouped.has(log.date)) grouped.set(log.date, new Map())
       const byProject = grouped.get(log.date)!
-      const current = byProject.get(log.projectId) ?? { minutes: 0, memos: [] }
+      const current = byProject.get(log.projectId) ?? { minutes: 0, descriptions: [] }
       byProject.set(log.projectId, {
         minutes: current.minutes + durationMinutes(log.startTime, log.endTime),
-        memos: log.memo ? [...current.memos, log.memo] : current.memos
+        descriptions: log.description
+          ? [...current.descriptions, log.description]
+          : current.descriptions
       })
     }
 
@@ -78,12 +85,14 @@ export function SummaryPage({ projects }: SummaryPageProps): React.JSX.Element {
     return days.map((day) => {
       const dateKey = format(day, 'yyyy-MM-dd')
       const byProject = grouped.get(dateKey) ?? new Map()
-      const entries = Array.from(byProject.entries()).map(([projectId, { minutes, memos }]) => ({
-        projectId,
-        project: projectMap.get(projectId),
-        minutes,
-        memo: memos.join('、')
-      }))
+      const entries = Array.from(byProject.entries()).map(
+        ([projectId, { minutes, descriptions }]) => ({
+          projectId,
+          project: projectMap.get(projectId),
+          minutes,
+          description: [...new Set(descriptions)].join('、')
+        })
+      )
       return { dateKey, entries, totalMinutes: entries.reduce((s, e) => s + e.minutes, 0) }
     })
   }, [logs, projects, startDate, endDate])
@@ -130,7 +139,7 @@ export function SummaryPage({ projects }: SummaryPageProps): React.JSX.Element {
                 </div>
               ) : (
                 <>
-                  {entries.map(({ projectId, project, minutes, memo }) => (
+                  {entries.map(({ projectId, project, minutes, description }) => (
                     <div
                       key={projectId}
                       className="grid grid-cols-[1fr_auto] items-center px-8 py-2 gap-4"
@@ -143,8 +152,8 @@ export function SummaryPage({ projects }: SummaryPageProps): React.JSX.Element {
                         <span className="text-sm text-foreground shrink-0">
                           {project?.name ?? projectId}
                         </span>
-                        {memo && (
-                          <span className="text-sm text-foreground/50 truncate">{memo}</span>
+                        {description && (
+                          <span className="text-sm text-foreground/50 truncate">{description}</span>
                         )}
                       </div>
                       <span className="text-sm text-foreground tabular-nums">

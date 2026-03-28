@@ -39,7 +39,7 @@ test.describe('1. 稼働入力・表示', () => {
     await expect(ts.modal.projectCombobox).toContainText('開発業務')
 
     // Step 3: メモ欄に「テスト作業」と入力し「保存」ボタンをクリック
-    await ts.modal.memoInput.fill('テスト作業')
+    await ts.modal.descriptionInput.fill('テスト作業')
     await ts.modal.save()
 
     // Step 4: 月曜日列に稼働ブロックが表示されること

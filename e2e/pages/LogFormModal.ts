@@ -4,7 +4,7 @@ export class LogFormModal {
   readonly dialog: Locator
   readonly startTimeInput: Locator
   readonly endTimeInput: Locator
-  readonly memoInput: Locator
+  readonly descriptionInput: Locator
   readonly projectCombobox: Locator
   readonly saveButton: Locator
 
@@ -12,7 +12,7 @@ export class LogFormModal {
     this.dialog = page.getByRole('dialog')
     this.startTimeInput = this.dialog.getByPlaceholder('09:00')
     this.endTimeInput = this.dialog.getByPlaceholder('10:00')
-    this.memoInput = this.dialog.getByPlaceholder('作業内容など（500文字以内）')
+    this.descriptionInput = this.dialog.getByPlaceholder('作業内容など（500文字以内）')
     this.projectCombobox = this.dialog.getByRole('combobox')
     this.saveButton = this.dialog.getByRole('button', { name: '保存' })
   }

@@ -11,7 +11,7 @@ const EXISTING_ENTRY = {
   projectId: 'proj-1',
   startTime: '10:00',
   endTime: '11:00',
-  memo: '既存メモ',
+  description: '既存メモ',
   createdAt: '2026-02-23T01:00:00.000Z'
 }
 
@@ -56,11 +56,11 @@ test.describe('3. 稼働編集', () => {
     await expect(ts.modal.projectCombobox).toContainText('開発業務')
 
     // メモ欄に「既存メモ」が表示されていること
-    await expect(ts.modal.memoInput).toHaveValue('既存メモ')
+    await expect(ts.modal.descriptionInput).toHaveValue('既存メモ')
 
     // Step 3: 終了時刻を 12:00 に変更し、メモを「更新後メモ」に書き換えて保存
     await ts.modal.endTimeInput.fill('12:00')
-    await ts.modal.memoInput.fill('更新後メモ')
+    await ts.modal.descriptionInput.fill('更新後メモ')
     await ts.modal.save()
 
     // Step 4: 月曜日列の稼働ブロックが 10:00〜12:00 に更新されていること
