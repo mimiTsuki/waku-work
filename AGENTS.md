@@ -32,6 +32,7 @@ src/core/ has NO dependency on main/ or server/
 ```
 
 > **Always read `@src/renderer/docs/architecture.md` before implementing anything under `src/renderer/`.**
+> **Always read `@docs/renderer/screen.md` when screen names appear in instructions or when identifying which file corresponds to a screen.**
 
 ## Commands
 
