@@ -1,8 +1,9 @@
-import { okAsync } from 'neverthrow'
+import { errAsync, okAsync } from 'neverthrow'
 import { join } from 'path'
 import { z } from 'zod'
 import type { AppConfig } from '../config/domain'
 import { readJsonFile } from '../file/jsonFile'
+import { FileNotFound } from '../file/error/fileNotFound'
 import { createLogger } from '../utils/logger'
 
 const logger = createLogger('LogRepository')
@@ -16,13 +17,18 @@ export const FileListLogsRepository = {
     (getConfig: () => AppConfig): ListLogsRepository =>
     ({ year, month }) => {
       const filePath = _logFilePath(getConfig().dataDir, year, month)
-      return readJsonFile(filePath, z.array(LogEntry.schema)).orTee((e) => {
-        logger.error('作業ログファイルの読み込みに失敗しました。', {
-          'file.path': filePath,
-          'error.code': e.type,
-          'error.message': e.message
+      return readJsonFile(filePath, z.array(LogEntry.schema))
+        .orElse((e) => {
+          if (e.type === FileNotFound.type) return okAsync([])
+          return errAsync(e)
         })
-      })
+        .orTee((e) => {
+          logger.error('作業ログファイルの読み込みに失敗しました。', {
+            'file.path': filePath,
+            'error.code': e.type,
+            'error.message': e.message
+          })
+        })
     }
 }
 
