@@ -38,7 +38,7 @@ export function DatePicker({ selected, onSelect }: DatePickerProps) {
         <button
           type="button"
           onClick={() => setViewDate(subMonths(viewDate, 1))}
-          className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-primary/70"
+          className="h-8 w-8 flex items-center justify-center rounded-md hover:text-primary-foreground"
         >
           <ChevronLeftIcon className="size-4" />
         </button>
@@ -46,7 +46,7 @@ export function DatePicker({ selected, onSelect }: DatePickerProps) {
         <button
           type="button"
           onClick={() => setViewDate(addMonths(viewDate, 1))}
-          className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-card"
+          className="h-8 w-8 flex items-center justify-center rounded-md hover:text-primary-foreground"
         >
           <ChevronRightIcon className="size-4" />
         </button>
@@ -58,8 +58,8 @@ export function DatePicker({ selected, onSelect }: DatePickerProps) {
             key={d}
             className={cn(
               'flex items-center justify-center h-7 text-xs text-muted-foreground',
-              i === 0 && 'text-red-400 dark:text-red-600',
-              i === 6 && 'text-cerulean-400 dark:text-cerulean-600'
+              i === 0 && 'text-pink-600 dark:text-pink-500',
+              i === 6 && 'text-sky-600 dark:text-sky-500'
             )}
           >
             {d}

@@ -147,7 +147,7 @@ export function LogFormModal({
                     </button>
                   </Field.Control>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-3 bg-background" align="start">
+                <PopoverContent className="w-auto p-3 bg-popover" align="start">
                   <DatePicker
                     selected={dateStr ? parseDateKey(dateStr) : new Date()}
                     onSelect={(d) => {

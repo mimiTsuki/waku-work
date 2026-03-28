@@ -2,7 +2,7 @@ import { cn } from '@renderer/lib/utils'
 import { cva } from 'class-variance-authority'
 
 const dayButtonVariants = cva(
-  'w-full aspect-square flex items-center justify-center text-sm rounded-md hover:bg-card hover:text-accent-foreground transition-colors',
+  'w-full aspect-square flex items-center justify-center text-sm rounded-md text-button-foreground hover:bg-button-hover transition-colors',
   {
     variants: {
       selected: {
