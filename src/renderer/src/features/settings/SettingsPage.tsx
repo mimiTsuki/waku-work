@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from '@renderer/components/button'
-import { Label } from '@renderer/components/label'
+import { Field } from '@renderer/components/field'
 import {
   Select,
   SelectContent,
@@ -38,12 +38,14 @@ export function SettingsPage(): React.JSX.Element {
   return (
     <div className="flex flex-col h-full py-12 px-6">
       <div className="flex flex-col max-w-xl w-full mx-auto rounded-2xl border border-transparent bg-card p-6 overflow-y-auto">
-        <div className="grid gap-2 mb-6">
-          <Label className="text-lg">テーマ</Label>
+        <Field.Root className="mb-6">
+          <Field.Label className="text-lg">テーマ</Field.Label>
           <Select value={config?.theme} onValueChange={(v) => handleThemeChange(v as Theme)}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
+            <Field.Control>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+            </Field.Control>
             <SelectContent>
               {THEME_OPTIONS.map(({ value, label }) => (
                 <SelectItem key={value} value={value}>
@@ -52,20 +54,22 @@ export function SettingsPage(): React.JSX.Element {
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </Field.Root>
 
         {IS_ELECTRON && (
-          <div className="grid gap-2">
-            <Label>データ保存フォルダ</Label>
+          <Field.Root>
+            <Field.Label>データ保存フォルダ</Field.Label>
             <div className="flex gap-2 items-center">
               <span className="text-sm text-muted-foreground flex-1 truncate">
                 {loading ? '読み込み中...' : (config?.dataDir ?? '未設定')}
               </span>
-              <Button variant="outline" size="sm" onClick={handleSelectFolder}>
-                変更
-              </Button>
+              <Field.Control>
+                <Button variant="outline" size="sm" onClick={handleSelectFolder}>
+                  変更
+                </Button>
+              </Field.Control>
             </div>
-          </div>
+          </Field.Root>
         )}
       </div>
     </div>

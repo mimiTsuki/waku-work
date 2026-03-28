@@ -10,9 +10,9 @@ import {
   DialogFooter
 } from '@renderer/components/dialog'
 import { Button } from '@renderer/components/button'
+import { Field } from '@renderer/components/field'
 import { Input } from '@renderer/components/input'
 import { Textarea } from '@renderer/components/textarea'
-import { Label } from '@renderer/components/label'
 import {
   Select,
   SelectContent,
@@ -130,20 +130,22 @@ export function LogFormModal({
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-6 py-4">
             {/* Date */}
-            <div className="grid gap-2">
-              <Label>日付</Label>
+            <Field.Root>
+              <Field.Label>日付</Field.Label>
               <Popover open={calOpen} onOpenChange={setCalOpen}>
                 <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      'h-10 px-4 py-2 justify-start text-left font-normal border border-border text-button-foreground cursor-pointer inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
-                      !dateStr && 'text-muted-foreground'
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateStr ? format(parseDateKey(dateStr), 'yyyy/MM/dd') : '日付を選択'}
-                  </button>
+                  <Field.Control>
+                    <button
+                      type="button"
+                      className={cn(
+                        'h-10 px-4 py-2 justify-start text-left font-normal border border-border text-button-foreground cursor-pointer inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+                        !dateStr && 'text-muted-foreground'
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateStr ? format(parseDateKey(dateStr), 'yyyy/MM/dd') : '日付を選択'}
+                    </button>
+                  </Field.Control>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-3 bg-background" align="start">
                   <DatePicker
@@ -155,37 +157,43 @@ export function LogFormModal({
                   />
                 </PopoverContent>
               </Popover>
-            </div>
+            </Field.Root>
 
             {/* Time */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label>開始時刻</Label>
-                <Input {...register('startTime')} placeholder="09:00" />
+              <Field.Root className="gap-y-1.5">
+                <Field.Label>開始時刻</Field.Label>
+                <Field.Control>
+                  <Input {...register('startTime')} placeholder="09:00" />
+                </Field.Control>
                 {errors.startTime && (
                   <p className="text-xs text-red-500">{errors.startTime.message}</p>
                 )}
-              </div>
-              <div className="grid gap-1.5">
-                <Label>終了時刻</Label>
-                <Input {...register('endTime')} placeholder="10:00" />
+              </Field.Root>
+              <Field.Root className="gap-y-1.5">
+                <Field.Label>終了時刻</Field.Label>
+                <Field.Control>
+                  <Input {...register('endTime')} placeholder="10:00" />
+                </Field.Control>
                 {errors.endTime && <p className="text-xs text-red-500">{errors.endTime.message}</p>}
-              </div>
+              </Field.Root>
             </div>
 
             {duration && <p className="text-sm text-muted-foreground">所要時間: {duration}</p>}
 
             {/* Project */}
-            <div className="grid gap-2">
-              <Label>案件</Label>
+            <Field.Root>
+              <Field.Label>案件</Field.Label>
               <Controller
                 control={control}
                 name="projectId"
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="案件を選択" />
-                    </SelectTrigger>
+                    <Field.Control>
+                      <SelectTrigger>
+                        <SelectValue placeholder="案件を選択" />
+                      </SelectTrigger>
+                    </Field.Control>
                     <SelectContent>
                       {projects.map((p) => (
                         <SelectItem key={p.id} value={p.id}>
@@ -205,15 +213,21 @@ export function LogFormModal({
               {errors.projectId && (
                 <p className="text-xs text-red-500">{errors.projectId.message}</p>
               )}
-            </div>
+            </Field.Root>
 
             {/* Memo */}
-            <div className="grid gap-2">
-              <Label>メモ</Label>
-              <Textarea {...register('memo')} rows={3} placeholder="作業内容など（500文字以内）" />
+            <Field.Root>
+              <Field.Label>メモ</Field.Label>
+              <Field.Control>
+                <Textarea
+                  {...register('memo')}
+                  rows={3}
+                  placeholder="作業内容など（500文字以内）"
+                />
+              </Field.Control>
               {errors.memo && <p className="text-xs text-red-500">{errors.memo.message}</p>}
               <p className="text-xs text-muted-foreground text-right">{memo?.length ?? 0}/500</p>
-            </div>
+            </Field.Root>
           </div>
 
           <DialogFooter>
