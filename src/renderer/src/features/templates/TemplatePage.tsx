@@ -27,6 +27,7 @@ import { colorPresetToCss } from '@renderer/lib/constants'
 import { formatDuration, durationMinutes } from '@renderer/lib/timeUtils'
 import type { Template } from '@shared/templates'
 import type { Project } from '@shared/projects'
+import { TemplateDeleteConfirmDialog } from './TemplateDeleteConfirmDialog'
 
 interface TemplateSectionProps {
   templates: Template[]
@@ -83,6 +84,7 @@ export function TemplateSection({
 }: TemplateSectionProps): React.JSX.Element {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<TemplateFormState | null>(null)
+  const [deletingTemplate, setDeletingTemplate] = useState<Template | null>(null)
 
   const handleNew = (): void => {
     setEditingId('new')
@@ -94,8 +96,10 @@ export function TemplateSection({
     setForm(templateToFormState(template))
   }
 
-  const handleDelete = async (id: string): Promise<void> => {
-    await onSave(templates.filter((t) => t.id !== id))
+  const handleDeleteConfirm = async (): Promise<void> => {
+    if (!deletingTemplate) return
+    await onSave(templates.filter((t) => t.id !== deletingTemplate.id))
+    setDeletingTemplate(null)
   }
 
   const handleClose = (): void => {
@@ -216,7 +220,7 @@ export function TemplateSection({
                     variant="ghost"
                     size="sm"
                     className="hover:text-destructive hover:bg-transparent"
-                    onClick={() => handleDelete(t.id)}
+                    onClick={() => setDeletingTemplate(t)}
                   >
                     <Trash2Icon className="h-4 w-4" />
                   </Button>
@@ -227,6 +231,14 @@ export function TemplateSection({
           ))}
         </ul>
       )}
+
+      {/* Delete confirm dialog */}
+      <TemplateDeleteConfirmDialog
+        open={deletingTemplate !== null}
+        template={deletingTemplate}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeletingTemplate(null)}
+      />
 
       {/* Edit dialog */}
       <Dialog open={editingId !== null} onOpenChange={(v) => !v && handleClose()}>
