@@ -86,60 +86,60 @@ export function TemplateSection({
         </div>
       ) : (
         <ul className="space-y-2">
-          {templates.map((t) => (
-            <li key={t.id} className="flex items-center gap-3 p-4 rounded-lg transition-colors">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{t.name}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t.entries.length}件のエントリ
-                  {(() => {
-                    const dur = totalDuration(t.entries)
-                    return dur ? ` · 合計 ${dur}` : ''
-                  })()}
-                </p>
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {t.entries.map((e) => {
-                    const project = projects.find((p) => p.id === e.projectId)
-                    return (
-                      <span
-                        key={e.id}
-                        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted/50"
-                      >
-                        {project && (
-                          <span
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: colorPresetToCss(project.color) }}
-                          />
-                        )}
-                        {e.startTime}-{e.endTime}
-                      </span>
-                    )
-                  })}
+          {templates.map((t) => {
+            const dur = totalDuration(t.entries)
+            return (
+              <li key={t.id} className="flex items-center gap-3 p-4 rounded-lg transition-colors">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{t.name}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t.entries.length}件のエントリ
+                    {dur && ` · 合計 ${dur}`}
+                  </p>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {t.entries.map((e) => {
+                      const project = projects.find((p) => p.id === e.projectId)
+                      return (
+                        <span
+                          key={e.id}
+                          className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted/50"
+                        >
+                          {project && (
+                            <span
+                              className="w-2 h-2 rounded-full"
+                              style={{ backgroundColor: colorPresetToCss(project.color) }}
+                            />
+                          )}
+                          {e.startTime}-{e.endTime}
+                        </span>
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="sm" onClick={() => handleEdit(t)}>
-                    <PencilIcon className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>編集</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="hover:text-destructive hover:bg-transparent"
-                    onClick={() => setDeletingTemplate(t)}
-                  >
-                    <Trash2Icon className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>削除</TooltipContent>
-              </Tooltip>
-            </li>
-          ))}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(t)}>
+                      <PencilIcon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>編集</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="hover:text-destructive hover:bg-transparent"
+                      onClick={() => setDeletingTemplate(t)}
+                    >
+                      <Trash2Icon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>削除</TooltipContent>
+                </Tooltip>
+              </li>
+            )
+          })}
         </ul>
       )}
 
