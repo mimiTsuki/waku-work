@@ -24,7 +24,7 @@ import type { Project } from '@shared/projects'
 
 interface TemplateEntryDraft {
   id: string
-  projectId: string
+  projectId: string | undefined // undefined = 未選択
   startTime: string
   endTime: string
   description: string
@@ -38,7 +38,7 @@ interface TemplateFormState {
 function createEmptyEntry(): TemplateEntryDraft {
   return {
     id: crypto.randomUUID(),
-    projectId: '',
+    projectId: undefined,
     startTime: '09:00',
     endTime: '10:00',
     description: ''
@@ -86,16 +86,19 @@ export function TemplateFormDialog({
   const handleSave = async (): Promise<void> => {
     if (!form || !form.name.trim() || form.entries.length === 0) return
 
-    const invalidIds = new Set(form.entries.filter((e) => !e.projectId).map((e) => e.id))
+    const invalidIds = new Set(
+      form.entries.filter((e) => e.projectId === undefined).map((e) => e.id)
+    )
     if (invalidIds.size > 0) {
       setValidationErrors(invalidIds)
       return
     }
 
+    const validEntries = form.entries as (TemplateEntryDraft & { projectId: string })[]
     const saved: Template = {
       id: template?.id ?? crypto.randomUUID(),
       name: form.name.trim(),
-      entries: form.entries
+      entries: validEntries
     }
 
     await onSave(saved)
@@ -202,7 +205,7 @@ export function TemplateFormDialog({
                     <Field.Root className="gap-y-1" invalid={validationErrors.has(entry.id)}>
                       <Field.Label className="text-xs">案件</Field.Label>
                       <Select
-                        value={entry.projectId}
+                        value={entry.projectId ?? ''}
                         onValueChange={(v) => updateEntry(index, { projectId: v })}
                       >
                         <Field.Control>
