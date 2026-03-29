@@ -23,6 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@renderer/components/tooltip'
+import { cn } from '@renderer/lib/utils'
 import { colorPresetToCss } from '@renderer/lib/constants'
 import { formatDuration, durationMinutes } from '@renderer/lib/timeUtils'
 import type { Template } from '@shared/templates'
@@ -85,6 +86,7 @@ export function TemplateSection({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<TemplateFormState | null>(null)
   const [deletingTemplate, setDeletingTemplate] = useState<Template | null>(null)
+  const [validationErrors, setValidationErrors] = useState<Set<string>>(new Set())
 
   const handleNew = (): void => {
     setEditingId('new')
@@ -105,18 +107,22 @@ export function TemplateSection({
   const handleClose = (): void => {
     setEditingId(null)
     setForm(null)
+    setValidationErrors(new Set())
   }
 
   const handleSave = async (): Promise<void> => {
     if (!form || !form.name.trim() || form.entries.length === 0) return
 
-    const validEntries = form.entries.filter((e) => e.projectId && e.startTime && e.endTime)
-    if (validEntries.length === 0) return
+    const invalidIds = new Set(form.entries.filter((e) => !e.projectId).map((e) => e.id))
+    if (invalidIds.size > 0) {
+      setValidationErrors(invalidIds)
+      return
+    }
 
     const template: Template = {
       id: editingId === 'new' ? crypto.randomUUID() : editingId!,
       name: form.name.trim(),
-      entries: validEntries
+      entries: form.entries
     }
 
     if (editingId === 'new') {
@@ -129,6 +135,14 @@ export function TemplateSection({
 
   const updateEntry = (index: number, patch: Partial<TemplateEntryDraft>): void => {
     if (!form) return
+    if (patch.projectId) {
+      const entryId = form.entries[index].id
+      setValidationErrors((prev) => {
+        const next = new Set(prev)
+        next.delete(entryId)
+        return next
+      })
+    }
     setForm({
       ...form,
       entries: form.entries.map((e, i) => (i === index ? { ...e, ...patch } : e))
@@ -302,14 +316,19 @@ export function TemplateSection({
                           </Field.Control>
                         </Field.Root>
                       </div>
-                      <Field.Root className="gap-y-1">
+                      <Field.Root className="gap-y-1" invalid={validationErrors.has(entry.id)}>
                         <Field.Label className="text-xs">案件</Field.Label>
                         <Select
                           value={entry.projectId}
                           onValueChange={(v) => updateEntry(index, { projectId: v })}
                         >
                           <Field.Control>
-                            <SelectTrigger className="h-8 text-sm">
+                            <SelectTrigger
+                              className={cn(
+                                'h-8 text-sm',
+                                validationErrors.has(entry.id) && 'border-destructive'
+                              )}
+                            >
                               <SelectValue placeholder="案件を選択" />
                             </SelectTrigger>
                           </Field.Control>
@@ -327,6 +346,9 @@ export function TemplateSection({
                             ))}
                           </SelectContent>
                         </Select>
+                        {validationErrors.has(entry.id) && (
+                          <p className="text-xs text-destructive">案件を選択してください</p>
+                        )}
                       </Field.Root>
                       <Field.Root className="gap-y-1">
                         <Field.Label className="text-xs">説明</Field.Label>
@@ -368,7 +390,7 @@ export function TemplateSection({
               variant="ghost"
               className="text-primary-foreground hover:bg-primary"
               onClick={handleSave}
-              disabled={!form?.name.trim() || !form?.entries.some((e) => e.projectId)}
+              disabled={!form?.name.trim()}
             >
               保存
             </Button>
