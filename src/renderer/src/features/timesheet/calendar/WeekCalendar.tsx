@@ -1,8 +1,15 @@
 import React, { useEffect, useRef, useCallback, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar, Copy } from 'lucide-react'
 import { format } from 'date-fns'
 import { useQueries } from '@tanstack/react-query'
 import { Button } from '@renderer/components/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/popover'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@renderer/components/tooltip'
 import { DragProvider } from '../context/DragProvider'
 import { TimeAxis } from './TimeAxis'
 import { DayColumn } from './DayColumn'
@@ -15,24 +22,29 @@ import { useWeekStartOnMonday } from '@renderer/hooks/useWeekStartOnMonday'
 import { HOUR_HEIGHT } from './constants'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
+import type { Template } from '@shared/templates'
 import { range } from '@renderer/lib/array/range'
 
 const ALL_DAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
 
 interface WeekCalendarProps {
   projects: Project[]
+  templates: Template[]
   onCreateRequest: (date: string, startTime: string, endTime: string) => void
   onDeleteRequest: (entry: LogEntry) => void
   onEditRequest: (entry: LogEntry) => void
   onUpdateEntry: (updated: LogEntry, original?: LogEntry) => Promise<void>
+  onApplyTemplate: (template: Template, dateKey: string) => Promise<void>
 }
 
 function WeekCalendarInner({
   projects,
+  templates,
   onCreateRequest,
   onDeleteRequest,
   onEditRequest,
-  onUpdateEntry
+  onUpdateEntry,
+  onApplyTemplate
 }: WeekCalendarProps): React.JSX.Element {
   const weekStartOnMonday = useWeekStartOnMonday()
   const { weekDays, weekDateKeys, weekLabel, goToPrevWeek, goToNextWeek, goToThisWeek } =
@@ -126,51 +138,81 @@ function WeekCalendarInner({
 
       <div className="flex flex-col rounded-2xl border border-transparent bg-card h-hull overflow-y-auto">
         {/* Day headers */}
-        <div className="flex shrink-0" role="row" aria-label="曜日ヘッダー">
-          <div className="w-14 shrink-0" />
-          {weekDays.map((day, i) => {
-            const dateKey = weekDateKeys[i]
-            const isToday = dateKey === today
-            const dayOfWeek = day.getDay()
-            const isSat = dayOfWeek === 6
-            const isSun = dayOfWeek === 0
-            const dayLabel = ALL_DAY_LABELS[dayOfWeek]
-            return (
-              <div
-                key={dateKey}
-                role="columnheader"
-                aria-label={`${dayLabel} ${format(day, 'M/d')}`}
-                className="flex-1 text-center py-2 text-xs font-medium"
-              >
+        <TooltipProvider>
+          <div className="flex shrink-0" role="row" aria-label="曜日ヘッダー">
+            <div className="w-14 shrink-0" />
+            {weekDays.map((day, i) => {
+              const dateKey = weekDateKeys[i]
+              const isToday = dateKey === today
+              const dayOfWeek = day.getDay()
+              const isSat = dayOfWeek === 6
+              const isSun = dayOfWeek === 0
+              const dayLabel = ALL_DAY_LABELS[dayOfWeek]
+              return (
                 <div
-                  className={
-                    isSat
-                      ? 'text-sky-600 dark:text-sky-500'
-                      : isSun
-                        ? 'text-pink-600 dark:text-pink-500'
-                        : 'text-foreground'
-                  }
+                  key={dateKey}
+                  role="columnheader"
+                  aria-label={`${dayLabel} ${format(day, 'M/d')}`}
+                  className="flex-1 text-center py-2 text-xs font-medium relative group"
                 >
-                  {dayLabel}
-                </div>
-                <div
-                  className={`text-sm font-semibold mt-0.5 w-8 h-8 flex items-center justify-center mx-auto rounded-full ${
-                    isToday
-                      ? // NOTE: 強調するためにforegroundと入れ替えている
-                        'bg-primary/70 dark:bg-primary-foreground dark:text-primary'
-                      : isSat
+                  <div
+                    className={
+                      isSat
                         ? 'text-sky-600 dark:text-sky-500'
                         : isSun
                           ? 'text-pink-600 dark:text-pink-500'
                           : 'text-foreground'
-                  }`}
-                >
-                  {format(day, 'd')}
+                    }
+                  >
+                    {dayLabel}
+                  </div>
+                  <div
+                    className={`text-sm font-semibold mt-0.5 w-8 h-8 flex items-center justify-center mx-auto rounded-full ${
+                      isToday
+                        ? // NOTE: 強調するためにforegroundと入れ替えている
+                          'bg-primary/70 dark:bg-primary-foreground dark:text-primary'
+                        : isSat
+                          ? 'text-sky-600 dark:text-sky-500'
+                          : isSun
+                            ? 'text-pink-600 dark:text-pink-500'
+                            : 'text-foreground'
+                    }`}
+                  >
+                    {format(day, 'd')}
+                  </div>
+                  {templates.length > 0 && (
+                    <Popover>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <PopoverTrigger asChild>
+                            <button className="absolute top-1 right-1 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-muted transition-opacity cursor-pointer">
+                              <Copy className="h-3 w-3 text-muted-foreground" />
+                            </button>
+                          </PopoverTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">テンプレート適用</TooltipContent>
+                      </Tooltip>
+                      <PopoverContent className="w-52 p-1" align="center">
+                        <p className="text-xs text-muted-foreground px-2 py-1">
+                          テンプレートを選択
+                        </p>
+                        {templates.map((t) => (
+                          <button
+                            key={t.id}
+                            className="w-full text-left px-3 py-1.5 text-sm rounded-md hover:bg-muted transition-colors cursor-pointer truncate"
+                            onClick={() => onApplyTemplate(t, dateKey)}
+                          >
+                            {t.name}
+                          </button>
+                        ))}
+                      </PopoverContent>
+                    </Popover>
+                  )}
                 </div>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+        </TooltipProvider>
 
         {/* Scrollable calendar grid */}
         <div

@@ -6,6 +6,7 @@ import type {
   ListLogsRequest,
   ListLogsResponse,
   ListProjectsResponse,
+  ListTemplatesResponse,
   MoveLogEntryRequest,
   MoveLogEntryResponse,
   SaveConfigRequest,
@@ -13,9 +14,17 @@ import type {
   SaveLogsRequest,
   SaveLogsResponse,
   SaveProjectsRequest,
-  SaveProjectsResponse
+  SaveProjectsResponse,
+  SaveTemplatesRequest,
+  SaveTemplatesResponse
 } from '../shared'
-import { CONFIG_CHANNELS, DIALOG_CHANNELS, LOG_CHANNELS, PROJECT_CHANNELS } from '../shared'
+import {
+  CONFIG_CHANNELS,
+  DIALOG_CHANNELS,
+  LOG_CHANNELS,
+  PROJECT_CHANNELS,
+  TEMPLATE_CHANNELS
+} from '../shared'
 
 export const api = {
   listLogs: (args: ListLogsRequest): Promise<ListLogsResponse> =>
@@ -31,7 +40,10 @@ export const api = {
   saveConfig: (data: SaveConfigRequest): Promise<SaveConfigResponse> =>
     ipcRenderer.invoke(CONFIG_CHANNELS.WRITE, data),
   selectFolder: (): Promise<DialogSelectFolderResponse> =>
-    ipcRenderer.invoke(DIALOG_CHANNELS.SELECT_FOLDER)
+    ipcRenderer.invoke(DIALOG_CHANNELS.SELECT_FOLDER),
+  listTemplates: (): Promise<ListTemplatesResponse> => ipcRenderer.invoke(TEMPLATE_CHANNELS.READ),
+  saveTemplates: (data: SaveTemplatesRequest): Promise<SaveTemplatesResponse> =>
+    ipcRenderer.invoke(TEMPLATE_CHANNELS.WRITE, data)
 }
 
 if (process.contextIsolated) {

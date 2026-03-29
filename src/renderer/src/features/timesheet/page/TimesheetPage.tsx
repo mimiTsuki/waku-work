@@ -1,6 +1,7 @@
+import React, { useState } from 'react'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
-import React, { useState } from 'react'
+import type { Template } from '@shared/templates'
 import { WeekCalendar } from '../calendar/WeekCalendar'
 import { DeleteConfirmDialog } from '../components/DeleteConfirmDialog'
 import { LogFormModal, ModalInitialState } from '../components/LogFormModal'
@@ -8,6 +9,7 @@ import { useLogMutations } from '../hooks/useLogMutations'
 
 interface TimesheetPageProps {
   projects: Project[]
+  templates: Template[]
 }
 
 interface ModalState {
@@ -15,7 +17,7 @@ interface ModalState {
   defaultValues?: ModalInitialState
 }
 
-export function TimesheetPage({ projects }: TimesheetPageProps): React.JSX.Element {
+export function TimesheetPage({ projects, templates }: TimesheetPageProps): React.JSX.Element {
   const { addEntry, updateEntry, deleteEntry } = useLogMutations()
   const [modal, setModal] = useState<ModalState>({ open: false })
   const [deleteTarget, setDeleteTarget] = useState<LogEntry | null>(null)
@@ -47,14 +49,31 @@ export function TimesheetPage({ projects }: TimesheetPageProps): React.JSX.Eleme
     }
   }
 
+  const handleApplyTemplate = async (template: Template, dateKey: string): Promise<void> => {
+    for (const entry of template.entries) {
+      const logEntry: LogEntry = {
+        id: crypto.randomUUID(),
+        date: dateKey,
+        projectId: entry.projectId,
+        startTime: entry.startTime,
+        endTime: entry.endTime,
+        description: entry.description,
+        createdAt: new Date().toISOString()
+      }
+      await addEntry(logEntry)
+    }
+  }
+
   return (
     <div className="h-full flex flex-col">
       <WeekCalendar
         projects={projects}
+        templates={templates}
         onCreateRequest={handleCreateRequest}
         onDeleteRequest={handleDeleteRequest}
         onEditRequest={handleEditRequest}
         onUpdateEntry={updateEntry}
+        onApplyTemplate={handleApplyTemplate}
       />
 
       <LogFormModal

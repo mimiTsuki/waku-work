@@ -3,6 +3,7 @@ import { ok, err } from 'neverthrow'
 import type { LogEntry } from '@shared/logs'
 import type { Config } from '@shared/config'
 import type { Project } from '@shared/projects'
+import type { Template } from '@shared/templates'
 import type { IpcError, IpcResult } from '@shared/result'
 
 function fromIpcResult<T>(result: IpcResult<T>): Result<T, IpcError> {
@@ -62,6 +63,14 @@ export async function writeConfig(config: Config): Promise<Result<void, IpcError
 
 export async function selectFolder(): Promise<string | null> {
   return prompt('データディレクトリのパスを入力:')
+}
+
+export async function readTemplates(): Promise<Result<Template[], IpcError>> {
+  return fetchApi<Template[]>('/templates')
+}
+
+export async function writeTemplates(templates: Template[]): Promise<Result<void, IpcError>> {
+  return fetchApi<void>('/templates', { method: 'PUT', body: JSON.stringify(templates) })
 }
 
 export const IS_ELECTRON = false

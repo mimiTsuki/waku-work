@@ -1,6 +1,7 @@
 import { ProjectPage, useProjects } from '@renderer/features/projects'
 import { SettingsPage, useTheme } from '@renderer/features/settings'
 import { SummaryPage } from '@renderer/features/summary'
+import { useTemplates } from '@renderer/features/templates'
 import { TimesheetPage } from '@renderer/features/timesheet'
 import { cn } from '@renderer/lib/utils'
 import { BarChart2, CalendarDays, FolderKanban, Settings } from 'lucide-react'
@@ -18,6 +19,7 @@ const NAV_ITEMS: { tab: Tab; icon: React.ReactNode; label: string }[] = [
 function App(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState<Tab>('log')
   const { projects, activeProjects, save: saveProjects, loading } = useProjects()
+  const { templates, save: saveTemplates } = useTemplates()
   useTheme()
 
   if (loading) {
@@ -51,10 +53,16 @@ function App(): React.JSX.Element {
 
       {/* Main content */}
       <main className="flex-1 overflow-hidden">
-        {activeTab === 'log' && <TimesheetPage projects={activeProjects} />}
+        {activeTab === 'log' && <TimesheetPage projects={activeProjects} templates={templates} />}
         {activeTab === 'summary' && <SummaryPage projects={projects} />}
         {activeTab === 'projects' && <ProjectPage projects={projects} onSave={saveProjects} />}
-        {activeTab === 'settings' && <SettingsPage />}
+        {activeTab === 'settings' && (
+          <SettingsPage
+            templates={templates}
+            projects={activeProjects}
+            onSaveTemplates={saveTemplates}
+          />
+        )}
       </main>
     </div>
   )

@@ -25,3 +25,11 @@ export type { Config, SaveConfigRequest, GetConfigResponse, SaveConfigResponse }
 
 export { DIALOG_CHANNELS } from './dialog'
 export type { DialogSelectFolderResponse } from './dialog'
+
+export { templateEntrySchema, templateSchema, TEMPLATE_CHANNELS } from './templates'
+export type {
+  Template as TemplateDto,
+  SaveTemplatesRequest,
+  ListTemplatesResponse,
+  SaveTemplatesResponse
+} from './templates'

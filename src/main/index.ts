@@ -36,6 +36,13 @@ import {
   ProjectController
 } from './project'
 import { DialogController } from './dialog'
+import {
+  FileListTemplatesRepository,
+  FileSaveTemplatesRepository,
+  ListTemplatesUsecase,
+  SaveTemplatesUsecase,
+  TemplateController
+} from './template'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -126,6 +133,8 @@ app.whenReady().then(async () => {
   const writeLogs = FileSaveLogsRepository.of(getConfigCache)
   const readProjects = FileListProjectsRepository.of(getConfigCache)
   const writeProjects = FileSaveProjectsRepository.of(getConfigCache)
+  const readTemplates = FileListTemplatesRepository.of(getConfigCache)
+  const writeTemplates = FileSaveTemplatesRepository.of(getConfigCache)
 
   // Usecase
 
@@ -137,6 +146,8 @@ app.whenReady().then(async () => {
   })
   const listProjectsUsecase = ListProjectsUsecase.of({ listProjects: readProjects })
   const saveProjectsUsecase = SaveProjectsUsecase.of({ writeProjects })
+  const listTemplatesUsecase = ListTemplatesUsecase.of({ listTemplates: readTemplates })
+  const saveTemplatesUsecase = SaveTemplatesUsecase.of({ writeTemplates })
   const getConfigUsecase = GetConfigUsecase.of({ getConfigRepository })
   const saveConfigUsecase = SaveConfigUsecase.of({
     saveConfigRepository,
@@ -148,6 +159,7 @@ app.whenReady().then(async () => {
   LogController.of({ listLogsUsecase, saveLogsUsecase, moveLogEntryUsecase })
   ProjectController.of({ listProjectsUsecase, saveProjectsUsecase })
   ConfigController.of({ getConfigUsecase, saveConfigUsecase })
+  TemplateController.of({ listTemplatesUsecase, saveTemplatesUsecase })
   DialogController.of()
 
   createWindow()

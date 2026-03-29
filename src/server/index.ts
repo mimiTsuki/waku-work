@@ -17,10 +17,16 @@ import {
   FileSaveProjectsRepository
 } from '@core/project/infrastructure'
 import { ListProjectsUsecase, SaveProjectsUsecase } from '@core/project/usecase'
+import {
+  FileListTemplatesRepository,
+  FileSaveTemplatesRepository
+} from '@core/template/infrastructure'
+import { ListTemplatesUsecase, SaveTemplatesUsecase } from '@core/template/usecase'
 import { createLogger } from '@core/utils/logger'
 import { configRoutes } from './routes/config'
 import { logsRoutes } from './routes/logs'
 import { projectsRoutes } from './routes/projects'
+import { templatesRoutes } from './routes/templates'
 
 const logger = createLogger('server')
 
@@ -53,6 +59,8 @@ const main = async () => {
   const writeLogs = FileSaveLogsRepository.of(getConfigCache)
   const readProjects = FileListProjectsRepository.of(getConfigCache)
   const writeProjects = FileSaveProjectsRepository.of(getConfigCache)
+  const readTemplates = FileListTemplatesRepository.of(getConfigCache)
+  const writeTemplates = FileSaveTemplatesRepository.of(getConfigCache)
 
   const listLogsUsecase = ListLogsUsecase.of({ listLogsRepository: readLogs })
   const saveLogsUsecase = SaveLogsUsecase.of({ saveLogsRepository: writeLogs })
@@ -62,6 +70,8 @@ const main = async () => {
   })
   const listProjectsUsecase = ListProjectsUsecase.of({ listProjects: readProjects })
   const saveProjectsUsecase = SaveProjectsUsecase.of({ writeProjects })
+  const listTemplatesUsecase = ListTemplatesUsecase.of({ listTemplates: readTemplates })
+  const saveTemplatesUsecase = SaveTemplatesUsecase.of({ writeTemplates })
   const getConfigUsecase = GetConfigUsecase.of({ getConfigRepository })
   const saveConfigUsecase = SaveConfigUsecase.of({
     saveConfigRepository,
@@ -75,6 +85,7 @@ const main = async () => {
   app.route('/api', logsRoutes({ listLogsUsecase, saveLogsUsecase, moveLogEntryUsecase }))
   app.route('/api', projectsRoutes({ listProjectsUsecase, saveProjectsUsecase }))
   app.route('/api', configRoutes({ getConfigUsecase, saveConfigUsecase }))
+  app.route('/api', templatesRoutes({ listTemplatesUsecase, saveTemplatesUsecase }))
 
   app.use('/*', serveStatic({ root: './dist/renderer' }))
 
