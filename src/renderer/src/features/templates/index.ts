@@ -1,2 +1,2 @@
-export { TemplateSection } from './TemplatePage'
+export { TemplateSection } from './TemplateSection'
 export { useTemplates } from './useTemplates'
