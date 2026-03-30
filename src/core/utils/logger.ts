@@ -11,10 +11,10 @@ export const LogLevels = {
 export type LogLevel = (typeof LogLevels)[keyof typeof LogLevels]
 
 /**
- * 現在の環境設定に基づいたログレベル
- * 本番/検証環境ではINFO以上、ローカル/開発環境ではすべてのレベルを出力
+ * 現在の設定に基づいたログレベル
+ * デフォルトではINFO以上を出力し、--verbose オプションで全レベルを出力する
  */
-const showLogLevel = process.env.NODE_ENV === 'production' ? LogLevels.INFO : LogLevels.DEBUG
+const showLogLevel = process.argv.includes('--verbose') ? LogLevels.DEBUG : LogLevels.INFO
 
 /**
  * ログレベルの優先順位マップ
