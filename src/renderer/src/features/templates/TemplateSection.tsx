@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { PlusIcon, Trash2Icon, PencilIcon } from 'lucide-react'
 import { Button } from '@renderer/components/button'
+import { Toast } from '@renderer/components/toast'
 import {
   Tooltip,
   TooltipContent,
@@ -9,6 +10,7 @@ import {
 } from '@renderer/components/tooltip'
 import { colorPresetToCss } from '@renderer/lib/constants'
 import { formatDuration, durationMinutes } from '@renderer/lib/timeUtils'
+import { useToast } from '@renderer/hooks/useToast'
 import type { Template } from '@shared/templates'
 import type { Project } from '@shared/projects'
 import { TemplateDeleteConfirmDialog } from './TemplateDeleteConfirmDialog'
@@ -39,6 +41,7 @@ export function TemplateSection({
 }: TemplateSectionProps): React.JSX.Element {
   const [editingTemplate, setEditingTemplate] = useState<Template | null | undefined>(undefined)
   const [deletingTemplate, setDeletingTemplate] = useState<Template | null>(null)
+  const toast = useToast()
 
   const handleNew = (): void => {
     setEditingTemplate(null)
@@ -54,18 +57,26 @@ export function TemplateSection({
 
   const handleDialogSave = async (template: Template): Promise<void> => {
     const isNew = !templates.some((t) => t.id === template.id)
-    if (isNew) {
-      await onSave([...templates, template])
-    } else {
-      await onSave(templates.map((t) => (t.id === template.id ? template : t)))
+    try {
+      if (isNew) {
+        await onSave([...templates, template])
+      } else {
+        await onSave(templates.map((t) => (t.id === template.id ? template : t)))
+      }
+      handleDialogClose()
+    } catch {
+      toast.error({ title: '保存に失敗しました', description: '再度お試しください。' })
     }
-    handleDialogClose()
   }
 
   const handleDeleteConfirm = async (): Promise<void> => {
     if (!deletingTemplate) return
-    await onSave(templates.filter((t) => t.id !== deletingTemplate.id))
-    setDeletingTemplate(null)
+    try {
+      await onSave(templates.filter((t) => t.id !== deletingTemplate.id))
+      setDeletingTemplate(null)
+    } catch {
+      toast.error({ title: '削除に失敗しました', description: '再度お試しください。' })
+    }
   }
 
   return (
@@ -159,6 +170,19 @@ export function TemplateSection({
         onSave={handleDialogSave}
         onClose={handleDialogClose}
       />
+
+      {/* Error toast */}
+      <Toast.Root
+        variant="error"
+        open={toast.state.open}
+        onOpenChange={(open) => !open && toast.close()}
+      >
+        <div className="grid gap-1">
+          <Toast.Title>{toast.state.title}</Toast.Title>
+          <Toast.Description>{toast.state.description}</Toast.Description>
+        </div>
+        <Toast.Close />
+      </Toast.Root>
     </TooltipProvider>
   )
 }
