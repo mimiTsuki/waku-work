@@ -4,6 +4,7 @@ import { SummaryPage } from '@renderer/features/summary'
 import { useTemplates } from '@renderer/features/templates'
 import { TimesheetPage } from '@renderer/features/timesheet'
 import { cn } from '@renderer/lib/utils'
+import { Toast } from '@renderer/components/toast'
 import { BarChart2, CalendarDays, FolderKanban, Settings } from 'lucide-react'
 import React, { useState } from 'react'
 
@@ -31,40 +32,43 @@ function App(): React.JSX.Element {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar */}
-      <nav className="w-24 text-nav-foreground bg-nav dark:bg-background flex flex-col items-center gap-1 shrink-0 py-4 px-4">
-        {NAV_ITEMS.map(({ tab, icon, label }) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={cn(
-              'cursor-pointer flex flex-col items-center gap-1 w-full py-2 rounded-lg transition-colors',
-              activeTab === tab
-                ? 'bg-primary dark:text-primary-foreground dark:bg-primary'
-                : 'hover:bg-primary/30'
-            )}
-          >
-            {icon}
-            <span className="text-[10px] leading-none">{label}</span>
-          </button>
-        ))}
-      </nav>
+    <Toast.Provider>
+      <div className="flex h-screen overflow-hidden bg-background">
+        {/* Sidebar */}
+        <nav className="w-24 text-nav-foreground bg-nav dark:bg-background flex flex-col items-center gap-1 shrink-0 py-4 px-4">
+          {NAV_ITEMS.map(({ tab, icon, label }) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                'cursor-pointer flex flex-col items-center gap-1 w-full py-2 rounded-lg transition-colors',
+                activeTab === tab
+                  ? 'bg-primary dark:text-primary-foreground dark:bg-primary'
+                  : 'hover:bg-primary/30'
+              )}
+            >
+              {icon}
+              <span className="text-[10px] leading-none">{label}</span>
+            </button>
+          ))}
+        </nav>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-hidden">
-        {activeTab === 'log' && <TimesheetPage projects={activeProjects} templates={templates} />}
-        {activeTab === 'summary' && <SummaryPage projects={projects} />}
-        {activeTab === 'projects' && <ProjectPage projects={projects} onSave={saveProjects} />}
-        {activeTab === 'settings' && (
-          <SettingsPage
-            templates={templates}
-            projects={activeProjects}
-            onSaveTemplates={saveTemplates}
-          />
-        )}
-      </main>
-    </div>
+        {/* Main content */}
+        <main className="flex-1 overflow-hidden">
+          {activeTab === 'log' && <TimesheetPage projects={activeProjects} templates={templates} />}
+          {activeTab === 'summary' && <SummaryPage projects={projects} />}
+          {activeTab === 'projects' && <ProjectPage projects={projects} onSave={saveProjects} />}
+          {activeTab === 'settings' && (
+            <SettingsPage
+              templates={templates}
+              projects={activeProjects}
+              onSaveTemplates={saveTemplates}
+            />
+          )}
+        </main>
+      </div>
+      <Toast.Viewport />
+    </Toast.Provider>
   )
 }
 
