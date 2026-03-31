@@ -14,28 +14,12 @@ export const safeReadFile = (filePath: string): ResultAsync<string, FileNotFound
       return FileNotFound.fromMessage(e.message)
     }
     return IOError.fromMessage(String(e))
-  })
-    .andTee(() => logger.debug('ファイルの読み込みに成功しました。', { 'file.path': filePath }))
-    .orTee((e) =>
-      logger.error('ファイルの読み込みに失敗しました。', {
-        'file.path': filePath,
-        'error.code': e.type,
-        'error.message': e.message
-      })
-    )
+  }).andTee(() => logger.debug('ファイルの読み込みに成功しました。', { 'file.path': filePath }))
 
 export const safeWriteFile = (filePath: string, body: string): ResultAsync<void, IOError> =>
   ResultAsync.fromPromise(writeFile(filePath, body, 'utf-8'), (e) =>
     IOError.fromMessage(isErrnoException(e) ? e.message : String(e))
-  )
-    .andTee(() => logger.debug('ファイルの書き込みに成功しました。', { 'file.path': filePath }))
-    .orTee((e) =>
-      logger.error('ファイルの書き込みに失敗しました。', {
-        'file.path': filePath,
-        'error.code': e.type,
-        'error.message': e.message
-      })
-    )
+  ).andTee(() => logger.debug('ファイルの書き込みに成功しました。', { 'file.path': filePath }))
 
 const _exist = async (path: string): Promise<boolean> => {
   try {
@@ -69,15 +53,9 @@ export const safeEnsureDir = (path: string): ResultAsync<void, IOError> => {
     okAsync(path)
       .andThen((path) => {
         if (!safeExistFile(path)) {
-          return safeMkdir(path, { recursive: true })
-            .andTee(() => logger.info('ディレクトリを作成しました。', { 'file.path': path }))
-            .orTee((e) =>
-              logger.error('ディレクトリの作成に失敗しました。', {
-                'file.path': path,
-                'error.code': e.type,
-                'error.message': e.message
-              })
-            )
+          return safeMkdir(path, { recursive: true }).andTee(() =>
+            logger.info('ディレクトリを作成しました。', { 'file.path': path })
+          )
         }
         return okAsync(undefined)
       })
