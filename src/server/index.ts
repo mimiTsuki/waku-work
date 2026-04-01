@@ -10,7 +10,11 @@ import {
   FileSaveConfigRepository
 } from '@core/config/infrastructure'
 import { GetConfigUsecase, SaveConfigUsecase } from '@core/config/usecase'
-import { FileListLogsRepository, FileSaveLogsRepository } from '@core/log/infrastructure'
+import {
+  FileListLogsRepository,
+  FileSaveLogsRepository,
+  FileSaveMultipleLogsRepository
+} from '@core/log/infrastructure'
 import { ListLogsUsecase, MoveLogEntryUsecase, SaveLogsUsecase } from '@core/log/usecase'
 import {
   FileListProjectsRepository,
@@ -22,6 +26,7 @@ import {
   FileSaveTemplatesRepository
 } from '@core/template/infrastructure'
 import { ListTemplatesUsecase, SaveTemplatesUsecase } from '@core/template/usecase'
+import { recoverIncompleteWrites } from '@core/file/file'
 import { createLogger } from '@core/utils/logger'
 import { configRoutes } from './routes/config'
 import { logsRoutes } from './routes/logs'
@@ -55,6 +60,10 @@ const main = async () => {
 
   const saveConfigRepository = FileSaveConfigRepository.of({ ensureConfigDirRepository })
 
+  await recoverIncompleteWrites(getConfigCache().dataDir).orTee((e) =>
+    logger.warn('起動時リカバリに失敗しました。', { 'error.message': e.message })
+  )
+
   const readLogs = FileListLogsRepository.of(getConfigCache)
   const writeLogs = FileSaveLogsRepository.of(getConfigCache)
   const readProjects = FileListProjectsRepository.of(getConfigCache)
@@ -64,9 +73,11 @@ const main = async () => {
 
   const listLogsUsecase = ListLogsUsecase.of({ listLogsRepository: readLogs })
   const saveLogsUsecase = SaveLogsUsecase.of({ saveLogsRepository: writeLogs })
+  const writeMultipleLogs = FileSaveMultipleLogsRepository.of(getConfigCache)
   const moveLogEntryUsecase = MoveLogEntryUsecase.of({
     listLogsRepository: readLogs,
-    saveLogsRepository: writeLogs
+    saveLogsRepository: writeLogs,
+    saveMultipleLogsRepository: writeMultipleLogs
   })
   const listProjectsUsecase = ListProjectsUsecase.of({ listProjects: readProjects })
   const saveProjectsUsecase = SaveProjectsUsecase.of({ writeProjects })

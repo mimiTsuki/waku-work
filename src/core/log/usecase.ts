@@ -1,11 +1,12 @@
 import { z } from 'zod'
-import { errAsync, ok, ResultAsync, safeTry } from 'neverthrow'
+import { ok, ResultAsync, safeTry } from 'neverthrow'
 import { BaseError } from '../utils/error'
-import { createLogger } from '../utils/logger'
-
-const logger = createLogger('MoveLogEntryUsecase')
 import { LogEntry } from './domain'
-import type { ListLogsRepository, SaveLogsRepository } from './repository'
+import type {
+  ListLogsRepository,
+  SaveLogsRepository,
+  SaveMultipleLogsRepository
+} from './repository'
 
 // Input schemas
 
@@ -71,77 +72,43 @@ export const SaveLogsUsecase = {
 type MoveLogEntryUsecaseDeps = {
   listLogsRepository: ListLogsRepository
   saveLogsRepository: SaveLogsRepository
+  saveMultipleLogsRepository: SaveMultipleLogsRepository
 }
 
-// TODO: ロールバックの設計がイマイチなので将来的に修正する。
-// 単一ファイル: 一時ファイルの作成とロックの仕組み
-// 複数ファイル: WAL or コピーオンライト
-// rollbackがダメだったエラーを定義する
 export const MoveLogEntryUsecase = {
   of:
-    ({ listLogsRepository, saveLogsRepository }: MoveLogEntryUsecaseDeps): MoveLogEntryUsecase =>
+    ({
+      listLogsRepository,
+      saveLogsRepository,
+      saveMultipleLogsRepository
+    }: MoveLogEntryUsecaseDeps): MoveLogEntryUsecase =>
     ({ entryId, fromYear, fromMonth, toYear, toMonth, entry }) => {
+      const sameMonth = fromYear === toYear && fromMonth === toMonth
+
+      if (sameMonth) {
+        return safeTry<void, BaseError>(async function* () {
+          const logs = yield* await listLogsRepository({ year: fromYear, month: fromMonth })
+          const updated = [...logs.filter((e) => e.id !== entryId), entry]
+          yield* await saveLogsRepository({ year: fromYear, month: fromMonth, logs: updated })
+          return ok(undefined)
+        })
+      }
+
+      // NOTE: 複数ファイルへの書き込みはCopy-on-Writeでアトミックに実施する
       return safeTry<void, BaseError>(async function* () {
-        // 更新前のログを取得(ロールバック実行時に必要)
         const [fromLogs, toLogs] = yield* await ResultAsync.combine([
           listLogsRepository({ year: fromYear, month: fromMonth }),
           listLogsRepository({ year: toYear, month: toMonth })
         ])
 
-        // fromからはレコードを削除し、toへ追加する
-        const saveResult = safeTry(async function* () {
-          const filtered = fromLogs.filter((e) => e.id !== entryId)
-          yield* await saveLogsRepository({
-            year: fromYear,
-            month: fromMonth,
-            logs: filtered
-          })
-          yield* await saveLogsRepository({
-            year: toYear,
-            month: toMonth,
-            logs: [...toLogs, entry]
-          })
-          return ok(undefined)
-        })
+        const filtered = fromLogs.filter((e) => e.id !== entryId)
 
-        const moveContext = {
-          'entry.id': entryId,
-          from: `${fromYear}-${String(fromMonth).padStart(2, '0')}`,
-          to: `${toYear}-${String(toMonth).padStart(2, '0')}`
-        }
+        yield* await saveMultipleLogsRepository([
+          { year: fromYear, month: fromMonth, logs: filtered },
+          { year: toYear, month: toMonth, logs: [...toLogs, entry] }
+        ])
 
-        // rollback: 書き込みに失敗した場合は両ファイルの内容をもとに戻す
-        return saveResult.orElse((e) =>
-          safeTry(async function* () {
-            yield* await saveLogsRepository({ year: fromYear, month: fromMonth, logs: fromLogs })
-            yield* await saveLogsRepository({
-              year: toYear,
-              month: toMonth,
-              logs: toLogs
-            })
-            return errAsync(e)
-          })
-            // TODO: エラーメッセージを明確にする。ロールバックが成功したか失敗したか。エラーレベルも見直し
-            .andTee(() =>
-              logger.error('作業ログの月間移動に失敗しました。ロールバックは成功しました。', {
-                ...moveContext,
-                'error.code': e.type,
-                'error.message': e.message
-              })
-            )
-            .orTee((rollbackErr) =>
-              logger.error(
-                '作業ログの月間移動に失敗し、ロールバックにも失敗しました。データの整合性が損なわれている可能性があります。',
-                {
-                  ...moveContext,
-                  'error.code': rollbackErr.type,
-                  'error.message': rollbackErr.message,
-                  'original_error.code': e.type,
-                  'original_error.message': e.message
-                }
-              )
-            )
-        )
+        return ok(undefined)
       })
     }
 }

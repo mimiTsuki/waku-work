@@ -16,3 +16,7 @@ export type SaveLogsRepository = (input: {
   month: number
   logs: LogEntry[]
 }) => ResultAsync<void, IOError | SerializeError>
+
+export type SaveMultipleLogsRepository = (
+  inputs: Array<{ year: number; month: number; logs: LogEntry[] }>
+) => ResultAsync<void, IOError | SerializeError>

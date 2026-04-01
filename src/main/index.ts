@@ -3,6 +3,7 @@ import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import { env } from './env'
+import { recoverIncompleteWrites } from '@core/file/file'
 import { createLogger } from '@core/utils/logger'
 
 const logger = createLogger('app')
@@ -23,6 +24,7 @@ import {
 import {
   FileListLogsRepository,
   FileSaveLogsRepository,
+  FileSaveMultipleLogsRepository,
   ListLogsUsecase,
   MoveLogEntryUsecase,
   SaveLogsUsecase,
@@ -129,6 +131,10 @@ app.whenReady().then(async () => {
     ensureConfigDirRepository
   })
 
+  await recoverIncompleteWrites(getConfigCache().dataDir).orTee((e) =>
+    logger.warn('起動時リカバリに失敗しました。', { 'error.message': e.message })
+  )
+
   const readLogs = FileListLogsRepository.of(getConfigCache)
   const writeLogs = FileSaveLogsRepository.of(getConfigCache)
   const readProjects = FileListProjectsRepository.of(getConfigCache)
@@ -140,9 +146,11 @@ app.whenReady().then(async () => {
 
   const listLogsUsecase = ListLogsUsecase.of({ listLogsRepository: readLogs })
   const saveLogsUsecase = SaveLogsUsecase.of({ saveLogsRepository: writeLogs })
+  const writeMultipleLogs = FileSaveMultipleLogsRepository.of(getConfigCache)
   const moveLogEntryUsecase = MoveLogEntryUsecase.of({
     listLogsRepository: readLogs,
-    saveLogsRepository: writeLogs
+    saveLogsRepository: writeLogs,
+    saveMultipleLogsRepository: writeMultipleLogs
   })
   const listProjectsUsecase = ListProjectsUsecase.of({ listProjects: readProjects })
   const saveProjectsUsecase = SaveProjectsUsecase.of({ writeProjects })

@@ -1,4 +1,4 @@
-import { errAsync, okAsync } from 'neverthrow'
+import { errAsync, ok, okAsync, safeTry } from 'neverthrow'
 import { join } from 'path'
 import { z } from 'zod'
 import type { AppConfig } from '../config/domain'
@@ -7,10 +7,14 @@ import { FileNotFound } from '../file/error/fileNotFound'
 import { createLogger } from '../utils/logger'
 
 const logger = createLogger('LogRepository')
-import type { ListLogsRepository, SaveLogsRepository } from './repository'
+import type {
+  ListLogsRepository,
+  SaveLogsRepository,
+  SaveMultipleLogsRepository
+} from './repository'
 import { LogEntry } from './domain'
 import { jsonSerialize } from '../utils/json/serialize'
-import { safeWriteFile } from '../file/file'
+import { safeAtomicWriteFile, safeAtomicWriteFiles, type FileWrite } from '../file/file'
 
 export const FileListLogsRepository = {
   of:
@@ -43,7 +47,7 @@ export const FileSaveLogsRepository = {
       const filePath = _logFilePath(getConfig().dataDir, year, month)
       return okAsync(sorted)
         .andThen((s) => jsonSerialize(s))
-        .andThen((body) => safeWriteFile(filePath, body))
+        .andThen((body) => safeAtomicWriteFile(filePath, body))
         .orTee((e) => {
           logger.error('作業ログファイルの書き込みに失敗しました。', {
             'file.path': filePath,
@@ -52,6 +56,31 @@ export const FileSaveLogsRepository = {
           })
         })
     }
+}
+
+export const FileSaveMultipleLogsRepository = {
+  of:
+    (getConfig: () => AppConfig): SaveMultipleLogsRepository =>
+    (inputs) =>
+      safeTry(async function* () {
+        const dataDir = getConfig().dataDir
+        const fileWrites: FileWrite[] = []
+        for (const { year, month, logs } of inputs) {
+          const sorted = [...logs].sort((a, b) => {
+            if (a.date !== b.date) return a.date.localeCompare(b.date)
+            return a.startTime.localeCompare(b.startTime)
+          })
+          const body = yield* jsonSerialize(sorted)
+          fileWrites.push({ filePath: _logFilePath(dataDir, year, month), body })
+        }
+        yield* await safeAtomicWriteFiles(fileWrites)
+        return ok(undefined)
+      }).orTee((e) => {
+        logger.error('複数の作業ログファイルのアトミック書き込みに失敗しました。', {
+          'error.code': e.type,
+          'error.message': e.message
+        })
+      })
 }
 
 function _logFilePath(dataDir: string, year: number, month: number): string {

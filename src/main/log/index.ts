@@ -9,4 +9,8 @@ export {
   MoveLogEntryUsecase
 } from '@core/log/usecase'
 export type { ListLogsRepository, SaveLogsRepository } from '@core/log/repository'
-export { FileListLogsRepository, FileSaveLogsRepository } from '@core/log/infrastructure'
+export {
+  FileListLogsRepository,
+  FileSaveLogsRepository,
+  FileSaveMultipleLogsRepository
+} from '@core/log/infrastructure'
