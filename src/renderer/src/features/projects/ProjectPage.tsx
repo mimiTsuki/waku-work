@@ -73,50 +73,52 @@ export function ProjectPage({ projects, onSave }: ProjectPageProps): React.JSX.E
 
           {/* Project list */}
           <ul className="space-y-2 overflow-y-auto flex-1">
-            {projects.map((p) => (
-              <li
-                key={p.id}
-                className={`flex items-center gap-3 p-3 ${p.archived ? 'opacity-50' : ''}`}
-              >
-                <span
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: colorPresetToCss(p.color) }}
-                />
-                <span className="flex-1 text-sm">{p.name}</span>
-                {p.archived ? (
-                  <Button variant="ghost" size="sm" onClick={() => handleArchive(p.id)}>
-                    復元
-                  </Button>
-                ) : (
+            {[...projects]
+              .sort((a, b) => Number(a.archived) - Number(b.archived))
+              .map((p) => (
+                <li
+                  key={p.id}
+                  className={`flex items-center gap-3 p-3 ${p.archived ? 'opacity-50' : ''}`}
+                >
+                  <span
+                    className="w-4 h-4 rounded-full"
+                    style={{ backgroundColor: colorPresetToCss(p.color) }}
+                  />
+                  <span className="flex-1 text-sm">{p.name}</span>
+                  {p.archived ? (
+                    <Button variant="ghost" size="sm" onClick={() => handleArchive(p.id)}>
+                      復元
+                    </Button>
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:text-destructive hover:bg-transparent"
+                          onClick={() => handleArchive(p.id)}
+                        >
+                          <ArchiveIcon className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>アーカイブ</TooltipContent>
+                    </Tooltip>
+                  )}
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
                         size="sm"
                         className="hover:text-destructive hover:bg-transparent"
-                        onClick={() => handleArchive(p.id)}
+                        onClick={() => setDeleteTarget(p)}
                       >
-                        <ArchiveIcon className="h-4 w-4" />
+                        <Trash2Icon className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>アーカイブ</TooltipContent>
+                    <TooltipContent>削除</TooltipContent>
                   </Tooltip>
-                )}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="hover:text-destructive hover:bg-transparent"
-                      onClick={() => setDeleteTarget(p)}
-                    >
-                      <Trash2Icon className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>削除</TooltipContent>
-                </Tooltip>
-              </li>
-            ))}
+                </li>
+              ))}
           </ul>
         </div>
       </div>
