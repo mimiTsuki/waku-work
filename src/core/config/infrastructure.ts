@@ -2,7 +2,7 @@ import { existsSync } from 'fs'
 import { okAsync } from 'neverthrow'
 import { homedir } from 'os'
 import { join } from 'path'
-import { safeEnsureDir, safeWriteFile } from '../file/file'
+import { safeEnsureDir, safeAtomicWriteFile } from '../file/file'
 import { readJsonFile } from '../file/jsonFile'
 import { jsonSerialize } from '../utils/json/serialize'
 import { createLogger } from '../utils/logger'
@@ -31,7 +31,7 @@ const _ensureConfigFile = () => {
   if (existsSync(CONFIG_FILE)) {
     return okAsync(undefined)
   }
-  return safeWriteFile(CONFIG_FILE, JSON.stringify(DEFAULT_CONFIG))
+  return safeAtomicWriteFile(CONFIG_FILE, JSON.stringify(DEFAULT_CONFIG))
     .andTee(() =>
       logger.info('デフォルト設定ファイルを作成しました。', { 'file.path': CONFIG_FILE })
     )
@@ -92,7 +92,7 @@ export const FileSaveConfigRepository = {
       ensureConfigDirRepository()
       return okAsync(config)
         .andThen((c) => jsonSerialize(c))
-        .andThen((json) => safeWriteFile(CONFIG_FILE, json))
+        .andThen((json) => safeAtomicWriteFile(CONFIG_FILE, json))
         .orTee((e) => {
           logger.error('設定ファイルの保存に失敗しました。', {
             'file.path': CONFIG_FILE,

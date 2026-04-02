@@ -12,7 +12,7 @@ import { createLogger } from '../utils/logger'
 
 const logger = createLogger('TemplateRepository')
 import { jsonSerialize } from '../utils/json/serialize'
-import { safeWriteFile } from '../file/file'
+import { safeAtomicWriteFile } from '../file/file'
 
 const TEMPLATES_FILE = 'templates.json'
 
@@ -45,7 +45,7 @@ export const FileSaveTemplatesRepository = {
 
       return okAsync(templates)
         .andThen((t) => jsonSerialize(t))
-        .andThen((body) => safeWriteFile(filePath, body))
+        .andThen((body) => safeAtomicWriteFile(filePath, body))
         .orTee((e) => {
           logger.error('テンプレートファイルの書き込みに失敗しました。', {
             'file.path': filePath,

@@ -11,7 +11,7 @@ import { createLogger } from '../utils/logger'
 
 const logger = createLogger('ProjectRepository')
 import { jsonSerialize } from '../utils/json/serialize'
-import { safeWriteFile } from '../file/file'
+import { safeAtomicWriteFile } from '../file/file'
 
 const PROJECTS_FILE = 'projects.json'
 
@@ -39,7 +39,7 @@ export const FileSaveProjectsRepository = {
 
       return okAsync(projects)
         .andThen((p) => jsonSerialize(p))
-        .andThen((body) => safeWriteFile(filePath, body))
+        .andThen((body) => safeAtomicWriteFile(filePath, body))
         .orTee((e) => {
           logger.error('プロジェクトファイルの書き込みに失敗しました。', {
             'file.path': filePath,
