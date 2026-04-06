@@ -2,7 +2,7 @@
 
 | 画面名   | ファイルパス                                                                    |
 | -------- | ------------------------------------------------------------------------------- |
-| 稼働画面 | `src/renderer/src/features/timesheet/page/TimesheetPage.tsx`                    |
-| 集計画面 | `src/renderer/src/features/summary/SummaryPage.tsx`                             |
-| 案件画面 | `src/renderer/src/features/projects/ProjectPage.tsx`                            |
-| 設定画面 | `src/renderer/src/features/settings/SettingsPage.tsx`（テンプレート管理を含む） |
+| 稼働画面 | `src/renderer/src/pages/timesheet/ui/TimesheetPage.tsx`                         |
+| 集計画面 | `src/renderer/src/pages/summary/ui/SummaryPage.tsx`                             |
+| 案件画面 | `src/renderer/src/pages/projects/ui/ProjectPage.tsx`                            |
+| 設定画面 | `src/renderer/src/pages/settings/ui/SettingsPage.tsx`（テンプレート管理を含む） |
