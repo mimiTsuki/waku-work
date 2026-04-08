@@ -1,10 +1,7 @@
+import { Config, themeTypes } from '@shared/config'
 import { useEffect } from 'react'
-import { themeTypes } from '@shared/config'
-import { useConfig } from '@renderer/shared/config/useConfig'
 
-export function useTheme(): void {
-  const { config } = useConfig()
-
+export function useTheme(config: Config): void {
   useEffect(() => {
     const root = document.documentElement
     const theme = config?.theme ?? themeTypes.SYSTEM
@@ -29,5 +26,5 @@ export function useTheme(): void {
     return () => {
       mq.removeEventListener('change', handler)
     }
-  }, [config?.theme])
+  }, [config.theme])
 }

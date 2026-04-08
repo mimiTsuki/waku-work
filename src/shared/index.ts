@@ -28,7 +28,7 @@ export type { DialogSelectFolderResponse } from './dialog'
 
 export { templateEntrySchema, templateSchema, TEMPLATE_CHANNELS } from './templates'
 export type {
-  Template as TemplateDto,
+  Template,
   SaveTemplatesRequest,
   ListTemplatesResponse,
   SaveTemplatesResponse

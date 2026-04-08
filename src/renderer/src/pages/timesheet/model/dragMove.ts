@@ -3,7 +3,9 @@ import { useDragContext } from './dragContext'
 import { snapToTime, clampEndTime, timeToY } from './calendarLayout'
 import { timeToMinutes, minutesToTime, durationMinutes } from '@renderer/shared/lib/time'
 import { SNAP_MINUTES } from '@renderer/pages/timesheet/config/calendarConstants'
+
 import type { LogEntry } from '@shared/logs'
+import { useConfigContext } from '@renderer/entities/config'
 
 interface UseDragMoveOptions {
   weekColumnsRef: React.RefObject<(HTMLDivElement | null)[]>
@@ -15,6 +17,7 @@ export function useDragMove({ weekColumnsRef, weekDates, onSave }: UseDragMoveOp
   handleDragMoveStart: (e: React.MouseEvent, entry: LogEntry) => void
 } {
   const { setDragState, dragStateRef } = useDragContext()
+  const { hourHeight } = useConfigContext()
 
   const handleDragMoveStart = useCallback(
     (e: React.MouseEvent, entry: LogEntry) => {
@@ -28,7 +31,7 @@ export function useDragMove({ weekColumnsRef, weekDates, onSave }: UseDragMoveOp
       const rect = colEl?.getBoundingClientRect()
       if (!rect) return
 
-      const blockTop = rect.top + timeToY(entry.startTime)
+      const blockTop = rect.top + timeToY(entry.startTime, hourHeight)
       const offsetY = e.clientY - blockTop
       const duration = durationMinutes(entry.startTime, entry.endTime)
 
@@ -59,7 +62,7 @@ export function useDragMove({ weekColumnsRef, weekDates, onSave }: UseDragMoveOp
         if (!targetRect) return
 
         const y = e.clientY - targetRect.top - offsetY
-        const rawStart = snapToTime(Math.max(0, y))
+        const rawStart = snapToTime(Math.max(0, y), hourHeight)
         const startMins = timeToMinutes(rawStart)
         const endMins = Math.min(startMins + duration, 24 * 60 - SNAP_MINUTES)
         const clampedEnd = minutesToTime(endMins)
@@ -101,7 +104,7 @@ export function useDragMove({ weekColumnsRef, weekDates, onSave }: UseDragMoveOp
       document.addEventListener('mousemove', onMouseMove)
       document.addEventListener('mouseup', onMouseUp)
     },
-    [setDragState, dragStateRef, weekColumnsRef, weekDates, onSave]
+    [setDragState, dragStateRef, weekColumnsRef, weekDates, onSave, hourHeight]
   )
 
   return { handleDragMoveStart }

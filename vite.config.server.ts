@@ -13,7 +13,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@renderer/api': resolve(__dirname, 'src/renderer/src/api/index.http.ts'),
+      '@renderer/shared/api': resolve(__dirname, 'src/renderer/src/shared/api/http/index.ts'),
       '@renderer': resolve(__dirname, 'src/renderer/src'),
       '@shared': resolve(__dirname, 'src/shared'),
       '@': resolve(__dirname, 'src/renderer/src')

@@ -3,6 +3,7 @@ import { useDragContext } from './dragContext'
 import { snapToTime, clampEndTime } from './calendarLayout'
 import { timeToMinutes, minutesToTime } from '@renderer/shared/lib/time'
 import { SNAP_MINUTES, MIN_BLOCK_MINUTES } from '@renderer/pages/timesheet/config/calendarConstants'
+import { useConfigContext } from '@renderer/entities/config'
 
 interface UseDragCreateOptions {
   date: string
@@ -14,6 +15,7 @@ export function useDragCreate({ date, columnRef, onComplete }: UseDragCreateOpti
   handleMouseDown: (e: React.MouseEvent) => void
 } {
   const { setDragState, dragStateRef } = useDragContext()
+  const { hourHeight } = useConfigContext()
   const startYRef = useRef(0)
   const startTimeRef = useRef('')
   const isDraggingRef = useRef(false)
@@ -27,7 +29,7 @@ export function useDragCreate({ date, columnRef, onComplete }: UseDragCreateOpti
       if (!rect) return
 
       const y = e.clientY - rect.top
-      const startTime = snapToTime(y)
+      const startTime = snapToTime(y, hourHeight)
       startYRef.current = y
       startTimeRef.current = startTime
       isDraggingRef.current = false
@@ -44,7 +46,7 @@ export function useDragCreate({ date, columnRef, onComplete }: UseDragCreateOpti
           isDraggingRef.current = true
         }
 
-        const rawEnd = snapToTime(Math.max(currentY, startYRef.current))
+        const rawEnd = snapToTime(Math.max(currentY, startYRef.current), hourHeight)
         const endTime = clampEndTime(startTimeRef.current, rawEnd)
         setDragState({
           type: 'creating',
@@ -75,7 +77,7 @@ export function useDragCreate({ date, columnRef, onComplete }: UseDragCreateOpti
       document.addEventListener('mousemove', onMouseMove)
       document.addEventListener('mouseup', onMouseUp)
     },
-    [date, columnRef, setDragState, dragStateRef, onComplete]
+    [date, columnRef, setDragState, dragStateRef, onComplete, hourHeight]
   )
 
   return { handleMouseDown }

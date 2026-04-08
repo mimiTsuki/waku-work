@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { api } from '@renderer/shared/api'
 import { getYearMonth } from '@renderer/shared/lib/time'
-import { readLogs, writeLogs, moveLogEntry } from '@renderer/shared/api'
 import type { LogEntry } from '@shared/logs'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export function useLogMutations(): {
   addEntry: (entry: LogEntry) => Promise<void>
@@ -14,7 +14,7 @@ export function useLogMutations(): {
     queryClient.ensureQueryData({
       queryKey: ['logs', year, month],
       queryFn: async () => {
-        const result = await readLogs(year, month)
+        const result = await api.readLogs(year, month)
         if (result.isErr()) throw new Error(`[${result.error.type}] ${result.error.message}`)
         return result.value
       }
@@ -25,7 +25,7 @@ export function useLogMutations(): {
       const { year, month } = getYearMonth(entry.date)
       const existing = await ensureLogs(year, month)
       const updated = [...existing, entry]
-      const result = await writeLogs(year, month, updated)
+      const result = await api.writeLogs(year, month, updated)
       if (result.isErr()) throw new Error(`[${result.error.type}] ${result.error.message}`)
       return { year, month, logs: updated }
     },
@@ -41,7 +41,7 @@ export function useLogMutations(): {
       if (original && original.date !== updated.date) {
         // Cross-month move: delegate to atomic usecase
         const { year: oldYear, month: oldMonth } = getYearMonth(original.date)
-        const result = await moveLogEntry(
+        const result = await api.moveLogEntry(
           original.id,
           oldYear,
           oldMonth,
@@ -63,7 +63,7 @@ export function useLogMutations(): {
         // Same month update
         const logs = await ensureLogs(newYear, newMonth)
         const updatedLogs = logs.map((e) => (e.id === updated.id ? updated : e))
-        const result = await writeLogs(newYear, newMonth, updatedLogs)
+        const result = await api.writeLogs(newYear, newMonth, updatedLogs)
         if (result.isErr()) throw new Error(`[${result.error.type}] ${result.error.message}`)
         return { type: 'update' as const, year: newYear, month: newMonth, logs: updatedLogs }
       }
@@ -89,7 +89,7 @@ export function useLogMutations(): {
       const { year, month } = getYearMonth(entry.date)
       const logs = await ensureLogs(year, month)
       const filtered = logs.filter((e) => e.id !== entry.id)
-      const result = await writeLogs(year, month, filtered)
+      const result = await api.writeLogs(year, month, filtered)
       if (result.isErr()) throw new Error(`[${result.error.type}] ${result.error.message}`)
       return { year, month, logs: filtered }
     },

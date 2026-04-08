@@ -1,8 +1,4 @@
-import {
-  HOUR_HEIGHT,
-  SNAP_MINUTES,
-  MIN_BLOCK_MINUTES
-} from '@renderer/pages/timesheet/config/calendarConstants'
+import { SNAP_MINUTES, MIN_BLOCK_MINUTES } from '@renderer/pages/timesheet/config/calendarConstants'
 import { timeToMinutes, minutesToTime, durationMinutes } from '@renderer/shared/lib/time'
 import type { LogEntry } from '@shared/logs'
 
@@ -12,20 +8,20 @@ export interface PositionedEntry {
   totalColumns: number
 }
 
-export function snapToTime(y: number): string {
-  const totalMinutes = Math.round((y / HOUR_HEIGHT) * 60)
+export function snapToTime(y: number, hourHeight: number): string {
+  const totalMinutes = Math.round((y / hourHeight) * 60)
   const snapped = Math.round(totalMinutes / SNAP_MINUTES) * SNAP_MINUTES
   const clamped = Math.max(0, Math.min(snapped, 24 * 60 - SNAP_MINUTES))
   return minutesToTime(clamped)
 }
 
-export function timeToY(time: string): number {
-  return (timeToMinutes(time) / 60) * HOUR_HEIGHT
+export function timeToY(time: string, hourHeight: number): number {
+  return (timeToMinutes(time) / 60) * hourHeight
 }
 
-export function durationToHeight(start: string, end: string): number {
+export function durationToHeight(start: string, end: string, hourHeight: number): number {
   const mins = durationMinutes(start, end)
-  return (mins / 60) * HOUR_HEIGHT
+  return (mins / 60) * hourHeight
 }
 
 export function clampEndTime(start: string, end: string): string {

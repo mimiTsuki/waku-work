@@ -4,8 +4,8 @@ import { timeToY, durationToHeight } from '@renderer/pages/timesheet/model/calen
 import { useDragContext } from '@renderer/pages/timesheet/model/dragContext'
 import type { PositionedEntry } from '@renderer/pages/timesheet/model/calendarLayout'
 import type { LogEntry } from '@shared/logs'
-import type { Project } from '@shared/projects'
-import { colorPresetToCss } from '@renderer/shared/config/colorPresets'
+import { Project } from '@shared/projects'
+import { useConfigContext, colorPresetToCss } from '@renderer/entities/config'
 
 interface LogBlockProps {
   posEntry: PositionedEntry
@@ -25,12 +25,13 @@ export function LogBlock({
   onResizeStart
 }: LogBlockProps): React.JSX.Element {
   const { dragState } = useDragContext()
+  const { hourHeight } = useConfigContext()
   const { entry, columnIndex, totalColumns } = posEntry
   const [hovered, setHovered] = useState(false)
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null)
 
-  const top = timeToY(entry.startTime)
-  const height = durationToHeight(entry.startTime, entry.endTime)
+  const top = timeToY(entry.startTime, hourHeight)
+  const height = durationToHeight(entry.startTime, entry.endTime, hourHeight)
   const widthPercent = 100 / totalColumns
   const leftPercent = columnIndex * widthPercent
 
@@ -40,10 +41,10 @@ export function LogBlock({
   let displayHeight = height
   let displayTop = top
   if (isResizing && dragState.type === 'resizing') {
-    displayHeight = durationToHeight(entry.startTime, dragState.endTime)
+    displayHeight = durationToHeight(entry.startTime, dragState.endTime, hourHeight)
   }
   if (isMoving && dragState.type === 'moving') {
-    displayTop = timeToY(dragState.startTime)
+    displayTop = timeToY(dragState.startTime, hourHeight)
   }
 
   const bgColor = colorPresetToCss(project?.color)

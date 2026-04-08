@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useCallback, useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight, Calendar, Copy } from 'lucide-react'
-import { format } from 'date-fns'
-import { useQueries } from '@tanstack/react-query'
+import { DragProvider } from '@renderer/pages/timesheet/model/drag'
+import { useDragMove } from '@renderer/pages/timesheet/model/dragMove'
+import { useDragResize } from '@renderer/pages/timesheet/model/dragResize'
+import { range } from '@renderer/shared/lib/range'
+import { formatDateKey, getMonthsInRange } from '@renderer/shared/lib/time'
+import { useWeekNavigation } from '@renderer/shared/lib/weekNavigation'
 import { Button } from '@renderer/shared/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@renderer/shared/ui/popover'
 import {
@@ -10,20 +12,16 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@renderer/shared/ui/tooltip'
-import { DragProvider } from '@renderer/pages/timesheet/model/drag'
-import { TimeAxis } from './TimeAxis'
-import { DayColumn } from './DayColumn'
-import { useDragMove } from '@renderer/pages/timesheet/model/dragMove'
-import { useDragResize } from '@renderer/pages/timesheet/model/dragResize'
-import { formatDateKey, getMonthsInRange } from '@renderer/shared/lib/time'
-import { readLogs } from '@renderer/shared/api'
-import { useWeekNavigation } from '@renderer/shared/lib/weekNavigation'
-import { useWeekStartOnMonday } from '@renderer/shared/config/useWeekStart'
-import { HOUR_HEIGHT } from '@renderer/pages/timesheet/config/calendarConstants'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
 import type { Template } from '@shared/templates'
-import { range } from '@renderer/shared/lib/range'
+import { format } from 'date-fns'
+import { Calendar, ChevronLeft, ChevronRight, Copy } from 'lucide-react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { DayColumn } from './DayColumn'
+import { TimeAxis } from './TimeAxis'
+import { useLogs } from '@renderer/entities/log'
+import { useConfigContext } from '@renderer/entities/config'
 
 const ALL_DAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
 
@@ -46,7 +44,7 @@ function WeekCalendarInner({
   onUpdateEntry,
   onApplyTemplate
 }: WeekCalendarProps): React.JSX.Element {
-  const weekStartOnMonday = useWeekStartOnMonday()
+  const { weekStartOnMonday, hourHeight } = useConfigContext()
   const { weekDays, weekDateKeys, weekLabel, goToPrevWeek, goToNextWeek, goToThisWeek } =
     useWeekNavigation(weekStartOnMonday)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -67,18 +65,7 @@ function WeekCalendarInner({
 
   // Collect unique months needed for this week (1 or 2 months for cross-month weeks)
   const months = useMemo(() => getMonthsInRange(weekDateKeys[0], weekDateKeys[6]), [weekDateKeys])
-
-  // Fetch all months needed for the current week
-  const queries = useQueries({
-    queries: months.map(({ year, month }) => ({
-      queryKey: ['logs', year, month] as const,
-      queryFn: async () => {
-        const result = await readLogs(year, month)
-        if (result.isErr()) throw new Error(`[${result.error.type}] ${result.error.message}`)
-        return result.value
-      }
-    }))
-  })
+  const queries = useLogs(months)
 
   const allLogs = useMemo(() => queries.flatMap((q) => q.data ?? []), [queries])
 
@@ -90,9 +77,9 @@ function WeekCalendarInner({
   // Initial scroll to 07:00
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = 7 * HOUR_HEIGHT
+      scrollRef.current.scrollTop = 7 * hourHeight
     }
-  }, [])
+  }, [hourHeight])
 
   const { handleDragMoveStart } = useDragMove({
     weekColumnsRef,
@@ -226,7 +213,7 @@ function WeekCalendarInner({
           className="flex-1 overflow-y-auto p-4 overscroll-none"
           data-testid="calendar-scrollable"
         >
-          <div className="flex" style={{ height: 24.5 * HOUR_HEIGHT }}>
+          <div className="flex" style={{ height: 24.5 * hourHeight }}>
             <TimeAxis />
             {weekDateKeys.map((dateKey, i) => (
               <DayColumn

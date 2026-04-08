@@ -9,7 +9,7 @@ import {
 } from '@renderer/shared/ui/dialog'
 import { Button } from '@renderer/shared/ui/button'
 import type { Project } from '@shared/projects'
-import { colorPresetToCss } from '@renderer/shared/config/colorPresets'
+import { colorPresetToCss } from '@renderer/entities/config'
 
 interface ProjectDeleteConfirmDialogProps {
   open: boolean

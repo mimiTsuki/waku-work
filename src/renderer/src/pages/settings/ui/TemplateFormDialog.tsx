@@ -18,9 +18,9 @@ import {
 } from '@renderer/shared/ui/dialog'
 import { Field } from '@renderer/shared/ui/field'
 import { cn } from '@renderer/shared/lib/cn'
-import { colorPresetToCss } from '@renderer/shared/config/colorPresets'
 import type { Template } from '@shared/templates'
 import type { Project } from '@shared/projects'
+import { colorPresetToCss } from '@renderer/entities/config'
 
 interface TemplateEntryDraft {
   id: string

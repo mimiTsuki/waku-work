@@ -23,7 +23,8 @@ const DEFAULT_DATA_DIR = join(homedir(), '.config', 'waku-work', 'data')
 export const DEFAULT_CONFIG: AppConfig = {
   dataDir: DEFAULT_DATA_DIR,
   theme: 'system',
-  weekStartOnMonday: true
+  weekStartOnMonday: true,
+  hourHeight: 100
 }
 
 const _ensureConfigFile = () => {

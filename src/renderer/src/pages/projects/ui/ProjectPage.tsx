@@ -7,13 +7,15 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@renderer/shared/ui/tooltip'
-import { COLOR_PRESETS, ColorPreset, colorPresetToCss } from '@renderer/shared/config/colorPresets'
+
 import type { Project } from '@shared/projects'
 import { ProjectDeleteConfirmDialog } from './ProjectDeleteConfirmDialog'
-import { useProjects } from '@renderer/shared/api/projects'
+import { useMutationProjects, useProjects } from '@renderer/entities/project'
+import { COLOR_PRESETS, ColorPreset, colorPresetToCss } from '@renderer/entities/config'
 
 export function ProjectPage(): React.JSX.Element {
-  const { projects, save } = useProjects()
+  const { data: projects } = useProjects()
+  const { mutateAsync: saveProjects } = useMutationProjects()
   const [name, setName] = React.useState('')
   const [color, setColor] = React.useState<ColorPreset>(COLOR_PRESETS[0])
   const [deleteTarget, setDeleteTarget] = React.useState<Project | null>(null)
@@ -26,17 +28,17 @@ export function ProjectPage(): React.JSX.Element {
       color,
       archived: false
     }
-    await save([...projects, newProject])
+    await saveProjects([...projects, newProject])
     setName('')
   }
 
   const handleArchive = async (id: string): Promise<void> => {
-    await save(projects.map((p) => (p.id === id ? { ...p, archived: !p.archived } : p)))
+    await saveProjects(projects.map((p) => (p.id === id ? { ...p, archived: !p.archived } : p)))
   }
 
   const handleDelete = async (): Promise<void> => {
     if (!deleteTarget) return
-    await save(projects.filter((p) => p.id !== deleteTarget.id))
+    await saveProjects(projects.filter((p) => p.id !== deleteTarget.id))
     setDeleteTarget(null)
   }
 

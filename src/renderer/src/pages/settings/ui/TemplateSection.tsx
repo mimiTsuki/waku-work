@@ -8,18 +8,18 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@renderer/shared/ui/tooltip'
-import { colorPresetToCss } from '@renderer/shared/config/colorPresets'
 import { formatDuration, durationMinutes } from '@renderer/shared/lib/time'
 import { useToast } from '@renderer/shared/ui/toast/useToast'
 import type { Template } from '@shared/templates'
 import type { Project } from '@shared/projects'
 import { TemplateDeleteConfirmDialog } from './TemplateDeleteConfirmDialog'
 import { TemplateFormDialog } from './TemplateFormDialog'
+import { colorPresetToCss } from '@renderer/entities/config'
 
 interface TemplateSectionProps {
   templates: Template[]
   projects: Project[]
-  onSave: (templates: Template[]) => Promise<void>
+  onSave: (templates: Template[]) => void
 }
 
 function totalDuration(entries: Template['entries']): string | null {
@@ -59,9 +59,9 @@ export function TemplateSection({
     const isNew = !templates.some((t) => t.id === template.id)
     try {
       if (isNew) {
-        await onSave([...templates, template])
+        onSave([...templates, template])
       } else {
-        await onSave(templates.map((t) => (t.id === template.id ? template : t)))
+        onSave(templates.map((t) => (t.id === template.id ? template : t)))
       }
       handleDialogClose()
     } catch {
@@ -72,7 +72,7 @@ export function TemplateSection({
   const handleDeleteConfirm = async (): Promise<void> => {
     if (!deletingTemplate) return
     try {
-      await onSave(templates.filter((t) => t.id !== deletingTemplate.id))
+      onSave(templates.filter((t) => t.id !== deletingTemplate.id))
       setDeletingTemplate(null)
     } catch {
       toast.error({ title: '削除に失敗しました', description: '再度お試しください。' })

@@ -2,7 +2,7 @@ import React from 'react'
 import { timeToY, durationToHeight } from '@renderer/pages/timesheet/model/calendarLayout'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
-import { colorPresetToCss } from '@renderer/shared/config/colorPresets'
+import { useConfigContext, colorPresetToCss } from '@renderer/entities/config'
 
 interface MovingPreviewProps {
   entryId: string
@@ -19,6 +19,7 @@ export function MovingPreview({
   entries,
   projects
 }: MovingPreviewProps): React.JSX.Element | null {
+  const { hourHeight } = useConfigContext()
   const movingEntry = entries.find((e) => e.id === entryId)
   const project = movingEntry ? projects.find((p) => p.id === movingEntry.projectId) : undefined
 
@@ -28,8 +29,8 @@ export function MovingPreview({
       data-testid="drag-preview"
       aria-hidden="true"
       style={{
-        top: timeToY(startTime),
-        height: Math.max(durationToHeight(startTime, endTime), 4),
+        top: timeToY(startTime, hourHeight),
+        height: Math.max(durationToHeight(startTime, endTime, hourHeight), 4),
         backgroundColor: colorPresetToCss(project?.color)
       }}
     />

@@ -23,7 +23,6 @@ import {
 } from '@renderer/shared/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@renderer/shared/ui/popover'
 import { DatePicker } from '@renderer/shared/ui/datePicker'
-import { useWeekStartOnMonday } from '@renderer/shared/config/useWeekStart'
 import { CalendarIcon } from 'lucide-react'
 import { cn } from '@renderer/shared/lib/cn'
 import {
@@ -32,7 +31,6 @@ import {
   formatDuration,
   durationMinutes
 } from '@renderer/shared/lib/time'
-import { readLogs } from '@renderer/shared/api'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
 import {
@@ -41,7 +39,8 @@ import {
   logEntryToForm,
   formToLogEntry
 } from '@renderer/pages/timesheet/model/logForm'
-import { colorPresetToCss } from '@renderer/shared/config/colorPresets'
+import { useConfigContext, colorPresetToCss } from '@renderer/entities/config'
+import { api } from '@renderer/shared/api'
 
 export interface ModalCreateState {
   kind: 'create'
@@ -72,7 +71,7 @@ export function LogFormModal({
   onSave,
   onClose
 }: LogFormModalProps): React.JSX.Element {
-  const weekStartOnMonday = useWeekStartOnMonday()
+  const { weekStartOnMonday } = useConfigContext()
   const [calOpen, setCalOpen] = useState(false)
 
   const {
@@ -120,10 +119,11 @@ export function LogFormModal({
   const year = dateStr ? Number(dateStr.slice(0, 4)) : undefined
   const month = dateStr ? Number(dateStr.slice(5, 7)) : undefined
 
+  // TODO: hooksに切り出し
   const { data: monthLogs } = useQuery({
     queryKey: ['logs', year, month] as const,
     queryFn: async () => {
-      const result = await readLogs(year!, month!)
+      const result = await api.readLogs(year!, month!)
       if (result.isErr()) return []
       return result.value
     },

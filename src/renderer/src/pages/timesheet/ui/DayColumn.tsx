@@ -1,5 +1,5 @@
 import React, { useRef, useCallback } from 'react'
-import { HOUR_HEIGHT } from '@renderer/pages/timesheet/config/calendarConstants'
+
 import {
   timeToY,
   durationToHeight,
@@ -12,6 +12,7 @@ import { MovingPreview } from './MovingPreview'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
 import { cn } from '@renderer/shared/lib/cn'
+import { useConfigContext } from '@renderer/entities/config'
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
 
@@ -39,6 +40,7 @@ export function DayColumn({
   onResizeStart
 }: DayColumnProps): React.JSX.Element {
   const { dragState } = useDragContext()
+  const { hourHeight } = useConfigContext()
   const localRef = useRef<HTMLDivElement>(null)
 
   // Merge local ref (used by useDragCreate) with parent's callback ref
@@ -67,7 +69,7 @@ export function DayColumn({
     <div
       ref={mergedRef}
       className="relative flex-1 border-l border-border select-none"
-      style={{ height: 24 * HOUR_HEIGHT, minWidth: 0 }}
+      style={{ height: 24 * hourHeight, minWidth: 0 }}
       onMouseDown={handleMouseDown}
       data-testid="day-column"
       aria-label={`日列 ${date}`}
@@ -77,11 +79,11 @@ export function DayColumn({
         <React.Fragment key={h}>
           <div
             className={cn('absolute left-0 right-0 border-border', i !== 0 ? 'border-t' : '')}
-            style={{ top: h * HOUR_HEIGHT }}
+            style={{ top: h * hourHeight }}
           />
           <div
             className="absolute left-0 right-0 border-t border-border/50"
-            style={{ top: h * HOUR_HEIGHT + HOUR_HEIGHT / 2 }}
+            style={{ top: h * hourHeight + hourHeight / 2 }}
           />
         </React.Fragment>
       ))}
@@ -93,8 +95,11 @@ export function DayColumn({
           data-testid="drag-preview"
           aria-hidden="true"
           style={{
-            top: timeToY(dragState.startTime),
-            height: Math.max(durationToHeight(dragState.startTime, dragState.currentEndTime), 4)
+            top: timeToY(dragState.startTime, hourHeight),
+            height: Math.max(
+              durationToHeight(dragState.startTime, dragState.currentEndTime, hourHeight),
+              4
+            )
           }}
         />
       )}

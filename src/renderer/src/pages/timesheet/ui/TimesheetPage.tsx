@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
+import { useLogMutations } from '@renderer/entities/log'
+import { useProjects } from '@renderer/entities/project'
+import { useTemplates } from '@renderer/entities/template'
 import type { LogEntry } from '@shared/logs'
 import type { Template } from '@shared/templates'
-import { WeekCalendar } from './WeekCalendar'
+import React, { useState } from 'react'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { LogFormModal, ModalInitialState } from './LogFormModal'
-import { useLogMutations } from '@renderer/pages/timesheet/api/logMutations'
-import { useProjects } from '@renderer/shared/api/projects'
-import { useTemplates } from '@renderer/shared/api/templates'
+import { WeekCalendar } from './WeekCalendar'
 
 interface ModalState {
   open: boolean
@@ -14,8 +14,8 @@ interface ModalState {
 }
 
 export function TimesheetPage(): React.JSX.Element {
-  const { activeProjects: projects } = useProjects()
-  const { templates } = useTemplates()
+  const { data: projects } = useProjects()
+  const { data: templates } = useTemplates()
   const { addEntry, updateEntry, deleteEntry } = useLogMutations()
   const [modal, setModal] = useState<ModalState>({ open: false })
   const [deleteTarget, setDeleteTarget] = useState<LogEntry | null>(null)

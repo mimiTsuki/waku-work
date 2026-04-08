@@ -7,7 +7,7 @@ export default defineConfig({
   main: {
     resolve: {
       alias: {
-        '@core': resolve('src/core')
+        '@core': resolve(__dirname, 'src/core')
       }
     }
   },
@@ -15,10 +15,11 @@ export default defineConfig({
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src'),
-        '@main': resolve('src/main'),
-        '@shared': resolve('src/shared'),
-        '@': resolve('src/renderer/src')
+        '@renderer/shared/api': resolve(__dirname, 'src/renderer/src/shared/api/ipc/index.ts'),
+        '@renderer': resolve(__dirname, 'src/renderer/src'),
+        '@main': resolve(__dirname, 'src/main'),
+        '@shared': resolve(__dirname, 'src/shared'),
+        '@': resolve(__dirname, 'src/renderer/src')
       }
     },
     plugins: [react(), tailwindcss()]
