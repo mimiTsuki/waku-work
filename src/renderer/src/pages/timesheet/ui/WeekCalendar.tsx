@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useMemo } from 'react'
+import React, { useEffect, useRef, useCallback, useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight, Calendar, Copy } from 'lucide-react'
 import { format } from 'date-fns'
 import { useQueries } from '@tanstack/react-query'
@@ -117,7 +117,13 @@ function WeekCalendarInner({
     [weekDateKeys, handleResizeStart]
   )
 
-  const today = formatDateKey(new Date())
+  const [today, setToday] = useState(() => formatDateKey(new Date()))
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setToday(formatDateKey(new Date()))
+    }, 60_000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <div className="flex flex-col h-full">
