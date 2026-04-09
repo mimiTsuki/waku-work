@@ -3,7 +3,7 @@ import { useDragContext } from './dragContext'
 import { snapToTime, clampEndTime } from './calendarLayout'
 import { timeToMinutes, minutesToTime } from '@renderer/shared/lib/time'
 import { SNAP_MINUTES, MIN_BLOCK_MINUTES } from '@renderer/pages/timesheet/config/calendarConstants'
-import { useConfigContext } from '@renderer/entities/config'
+import { useConfig } from '@renderer/entities/config'
 
 interface UseDragCreateOptions {
   date: string
@@ -15,7 +15,9 @@ export function useDragCreate({ date, columnRef, onComplete }: UseDragCreateOpti
   handleMouseDown: (e: React.MouseEvent) => void
 } {
   const { setDragState, dragStateRef } = useDragContext()
-  const { hourHeight } = useConfigContext()
+  const {
+    data: { hourHeight }
+  } = useConfig()
   const startYRef = useRef(0)
   const startTimeRef = useRef('')
   const isDraggingRef = useRef(false)

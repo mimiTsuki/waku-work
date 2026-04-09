@@ -3,7 +3,7 @@ import { useDragContext } from './dragContext'
 import { snapToTime, clampEndTime } from './calendarLayout'
 
 import type { LogEntry } from '@shared/logs'
-import { useConfigContext } from '@renderer/entities/config'
+import { useConfig } from '@renderer/entities/config'
 
 interface UseDragResizeOptions {
   columnRef: React.RefObject<HTMLDivElement | null>
@@ -14,7 +14,9 @@ export function useDragResize({ columnRef, onSave }: UseDragResizeOptions): {
   handleResizeStart: (e: React.MouseEvent, entry: LogEntry) => void
 } {
   const { setDragState, dragStateRef } = useDragContext()
-  const { hourHeight } = useConfigContext()
+  const {
+    data: { hourHeight }
+  } = useConfig()
 
   const handleResizeStart = useCallback(
     (e: React.MouseEvent, entry: LogEntry) => {

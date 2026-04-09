@@ -1,10 +1,12 @@
-import { useConfigContext } from '@renderer/entities/config'
+import { useConfig } from '@renderer/entities/config'
 import React from 'react'
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
 
 export function TimeAxis(): React.JSX.Element {
-  const { hourHeight } = useConfigContext()
+  const {
+    data: { hourHeight }
+  } = useConfig()
   return (
     <div className="relative shrink-0 w-14 select-none" style={{ height: 24 * hourHeight }}>
       {HOURS.map((hour) => (

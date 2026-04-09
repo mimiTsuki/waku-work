@@ -11,7 +11,7 @@ import { eachDayOfInterval, format, parseISO } from 'date-fns'
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import React, { useMemo } from 'react'
 
-import { colorPresetToCss, useConfigContext } from '@renderer/entities/config'
+import { colorPresetToCss, useConfig } from '@renderer/entities/config'
 import { useProjects } from '@renderer/entities/project'
 import { useLogs } from '@renderer/entities/log'
 
@@ -35,7 +35,9 @@ interface DayData {
 
 export function SummaryPage(): React.JSX.Element {
   const { data: projects } = useProjects()
-  const { weekStartOnMonday } = useConfigContext()
+  const {
+    data: { weekStartOnMonday }
+  } = useConfig()
   const { weekDays, weekLabel, goToPrevWeek, goToNextWeek, goToThisWeek } =
     useWeekNavigation(weekStartOnMonday)
 

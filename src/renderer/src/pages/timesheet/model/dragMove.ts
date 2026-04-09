@@ -5,7 +5,7 @@ import { timeToMinutes, minutesToTime, durationMinutes } from '@renderer/shared/
 import { SNAP_MINUTES } from '@renderer/pages/timesheet/config/calendarConstants'
 
 import type { LogEntry } from '@shared/logs'
-import { useConfigContext } from '@renderer/entities/config'
+import { useConfig } from '@renderer/entities/config'
 
 interface UseDragMoveOptions {
   weekColumnsRef: React.RefObject<(HTMLDivElement | null)[]>
@@ -17,7 +17,9 @@ export function useDragMove({ weekColumnsRef, weekDates, onSave }: UseDragMoveOp
   handleDragMoveStart: (e: React.MouseEvent, entry: LogEntry) => void
 } {
   const { setDragState, dragStateRef } = useDragContext()
-  const { hourHeight } = useConfigContext()
+  const {
+    data: { hourHeight }
+  } = useConfig()
 
   const handleDragMoveStart = useCallback(
     (e: React.MouseEvent, entry: LogEntry) => {

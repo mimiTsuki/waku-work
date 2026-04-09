@@ -39,7 +39,7 @@ import {
   logEntryToForm,
   formToLogEntry
 } from '@renderer/pages/timesheet/model/logForm'
-import { useConfigContext, colorPresetToCss } from '@renderer/entities/config'
+import { useConfig, colorPresetToCss } from '@renderer/entities/config'
 import { api } from '@renderer/shared/api'
 
 export interface ModalCreateState {
@@ -71,7 +71,9 @@ export function LogFormModal({
   onSave,
   onClose
 }: LogFormModalProps): React.JSX.Element {
-  const { weekStartOnMonday } = useConfigContext()
+  const {
+    data: { weekStartOnMonday }
+  } = useConfig()
   const [calOpen, setCalOpen] = useState(false)
 
   const {

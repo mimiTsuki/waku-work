@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useConfigContext, useMutationConfig, useSelectFolder } from '@renderer/entities/config'
+import { useConfig, useMutationConfig, useSelectFolder } from '@renderer/entities/config'
 import { useProjects } from '@renderer/entities/project'
 import { useMutationTemplates, useTemplates } from '@renderer/entities/template'
 import { IS_ELECTRON } from '@renderer/shared/api'
@@ -49,7 +49,7 @@ const schema = z.object({
 type DraftFormType = z.infer<typeof schema>
 
 export const SettingsPage: FC = () => {
-  const config = useConfigContext()
+  const { data: config } = useConfig()
   const { data: templates } = useTemplates()
   const { data: projects } = useProjects()
   const { mutateAsync: mutateTemplates } = useMutationTemplates()

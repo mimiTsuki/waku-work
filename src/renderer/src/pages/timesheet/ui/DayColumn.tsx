@@ -12,7 +12,7 @@ import { MovingPreview } from './MovingPreview'
 import type { LogEntry } from '@shared/logs'
 import type { Project } from '@shared/projects'
 import { cn } from '@renderer/shared/lib/cn'
-import { useConfigContext } from '@renderer/entities/config'
+import { useConfig } from '@renderer/entities/config'
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
 
@@ -40,7 +40,9 @@ export function DayColumn({
   onResizeStart
 }: DayColumnProps): React.JSX.Element {
   const { dragState } = useDragContext()
-  const { hourHeight } = useConfigContext()
+  const {
+    data: { hourHeight }
+  } = useConfig()
   const localRef = useRef<HTMLDivElement>(null)
 
   // Merge local ref (used by useDragCreate) with parent's callback ref

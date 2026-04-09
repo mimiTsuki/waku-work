@@ -5,7 +5,7 @@ import { useDragContext } from '@renderer/pages/timesheet/model/dragContext'
 import type { PositionedEntry } from '@renderer/pages/timesheet/model/calendarLayout'
 import type { LogEntry } from '@shared/logs'
 import { Project } from '@shared/projects'
-import { useConfigContext, colorPresetToCss } from '@renderer/entities/config'
+import { useConfig, colorPresetToCss } from '@renderer/entities/config'
 
 interface LogBlockProps {
   posEntry: PositionedEntry
@@ -25,7 +25,9 @@ export function LogBlock({
   onResizeStart
 }: LogBlockProps): React.JSX.Element {
   const { dragState } = useDragContext()
-  const { hourHeight } = useConfigContext()
+  const {
+    data: { hourHeight }
+  } = useConfig()
   const { entry, columnIndex, totalColumns } = posEntry
   const [hovered, setHovered] = useState(false)
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null)

@@ -21,7 +21,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { DayColumn } from './DayColumn'
 import { TimeAxis } from './TimeAxis'
 import { useLogs } from '@renderer/entities/log'
-import { useConfigContext } from '@renderer/entities/config'
+import { useConfig } from '@renderer/entities/config'
 
 const ALL_DAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
 
@@ -44,7 +44,9 @@ function WeekCalendarInner({
   onUpdateEntry,
   onApplyTemplate
 }: WeekCalendarProps): React.JSX.Element {
-  const { weekStartOnMonday, hourHeight } = useConfigContext()
+  const {
+    data: { weekStartOnMonday, hourHeight }
+  } = useConfig()
   const { weekDays, weekDateKeys, weekLabel, goToPrevWeek, goToNextWeek, goToThisWeek } =
     useWeekNavigation(weekStartOnMonday)
   const scrollRef = useRef<HTMLDivElement>(null)
