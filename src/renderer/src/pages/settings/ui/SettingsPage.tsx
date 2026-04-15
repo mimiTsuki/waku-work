@@ -43,7 +43,8 @@ const schema = z.object({
     .number({ message: '40〜300 の整数を入力してください' })
     .int({ message: '40〜300 の整数を入力してください' })
     .min(40, { message: '40〜300 の整数を入力してください' })
-    .max(300, { message: '40〜300 の整数を入力してください' })
+    .max(300, { message: '40〜300 の整数を入力してください' }),
+  keyboardShortcuts: z.boolean()
 })
 
 type DraftFormType = z.infer<typeof schema>
@@ -171,6 +172,30 @@ export const SettingsPage: FC = () => {
                 {errors.hourHeight && (
                   <p className="text-sm text-destructive">{errors.hourHeight.message}</p>
                 )}
+              </Field.Root>
+
+              <Field.Root className="mb-6">
+                <Field.Label>キーボードショートカット（試験的）</Field.Label>
+                <Controller
+                  name="keyboardShortcuts"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value ? 'enabled' : 'disabled'}
+                      onValueChange={(v) => field.onChange(v === 'enabled')}
+                    >
+                      <Field.Control>
+                        <SelectTrigger className="w-40">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </Field.Control>
+                      <SelectContent>
+                        <SelectItem value="enabled">有効</SelectItem>
+                        <SelectItem value="disabled">無効</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </Field.Root>
 
               {IS_ELECTRON && (

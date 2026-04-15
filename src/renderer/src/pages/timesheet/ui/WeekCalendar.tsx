@@ -19,9 +19,11 @@ import { format } from 'date-fns'
 import { Calendar, ChevronLeft, ChevronRight, Copy } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { DayColumn } from './DayColumn'
+import { HintOverlay } from './HintOverlay'
 import { TimeAxis } from './TimeAxis'
 import { useLogs } from '@renderer/entities/log'
 import { useConfig } from '@renderer/entities/config'
+import { useHintMode } from '@renderer/pages/timesheet/model/hintMode'
 
 const ALL_DAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
 
@@ -105,6 +107,15 @@ function WeekCalendarInner({
     },
     [weekDateKeys, handleResizeStart]
   )
+
+  const hintState = useHintMode({
+    weekDateKeys,
+    allLogs,
+    hourHeight,
+    weekColumnsRef,
+    onEditRequest,
+    onCreateRequest
+  })
 
   const [today, setToday] = useState(() => formatDateKey(new Date()))
   useEffect(() => {
@@ -215,7 +226,7 @@ function WeekCalendarInner({
           className="flex-1 overflow-y-auto p-4 overscroll-none"
           data-testid="calendar-scrollable"
         >
-          <div className="flex" style={{ height: 24.5 * hourHeight }}>
+          <div className="relative flex" style={{ height: 24.5 * hourHeight }}>
             <TimeAxis />
             {weekDateKeys.map((dateKey, i) => (
               <DayColumn
@@ -231,6 +242,7 @@ function WeekCalendarInner({
                 onResizeStart={handleResizeStartWithCol}
               />
             ))}
+            <HintOverlay hintState={hintState} />
           </div>
         </div>
       </div>

@@ -59,6 +59,7 @@ export function LogBlock({
       tabIndex={0}
       aria-label={`${project?.name ?? '(no project)'} ${entry.startTime}〜${entry.endTime}${entry.description ? ' ' + entry.description : ''}`}
       data-testid="log-block"
+      data-entry-id={entry.id}
       className="absolute rounded overflow-hidden cursor-grab active:cursor-grabbing select-none"
       style={{
         top: displayTop,

@@ -24,7 +24,8 @@ export const DEFAULT_CONFIG: AppConfig = {
   dataDir: DEFAULT_DATA_DIR,
   theme: 'system',
   weekStartOnMonday: true,
-  hourHeight: 100
+  hourHeight: 100,
+  keyboardShortcuts: false
 }
 
 const _ensureConfigFile = () => {

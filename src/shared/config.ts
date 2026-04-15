@@ -19,7 +19,8 @@ export const appConfigSchema = z.object({
   dataDir: z.string(),
   theme: themeSchema.default(themeTypes.SYSTEM),
   weekStartOnMonday: z.boolean().default(true),
-  hourHeight: z.number().int().min(40).max(300).default(100)
+  hourHeight: z.number().int().min(40).max(300).default(100),
+  keyboardShortcuts: z.boolean().default(false)
 })
 
 export type Config = z.infer<typeof appConfigSchema>
